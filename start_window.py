@@ -6,12 +6,12 @@ class StartWindow:
     def __init__(self, size):
         pygame.init()
         self.screen = pygame.display.set_mode((size[0], size[1]))
-        pygame.display.set_caption("Adventures with mini games")
+        pygame.display.set_caption("Игровое окно")
         self.font = pygame.font.Font(None, 30)
         self.button_font = pygame.font.Font(None, 48)
 
-        self.start_button = pygame.Rect(300, 300, 200, 100)
-        self.title_game = "Adventures with mini games"
+        self.start_button = pygame.Rect(width / 2 - width / 2 / 4, height / 2, width / 4, 100)
+        self.title_game = "better together"
 
     def draw(self):
 
@@ -24,7 +24,8 @@ class StartWindow:
 
         # Отображаем текст
         title_game = pygame.font.Font(None, 74).render(self.title_game, True, (255, 255, 255))
-        self.screen.blit(title_game, (80, 100))
+
+        self.screen.blit(title_game, (230, 100))
 
         pygame.display.flip()
 
@@ -45,7 +46,7 @@ class StartWindow:
 
 
 pygame.init()
-size = width, height = 830, 900
+size = width, height = 900, 800
 screen = pygame.display.set_mode(size)
 
 StartWindow(size).run()
