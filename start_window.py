@@ -6,7 +6,7 @@ class StartWindow:
     def __init__(self, size):
         pygame.init()
         self.screen = pygame.display.set_mode((size[0], size[1]))
-        pygame.display.set_caption("Игровое окно")
+        pygame.display.set_caption("Better together")
         self.font = pygame.font.Font(None, 30)
         self.button_font = pygame.font.Font(None, 48)
 
