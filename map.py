@@ -4,12 +4,12 @@ import pygame
 
 from Minigame_memory.lvl_memory import play_memory
 from Minigame_minisweeper.lvl_minisweeper import play_sweeper
-from Minigame_snake.snake import play
+from Minigame_snake.snake import play_snake
 from load_image import load_image
 
 
 def window_snake():
-    play()
+    play_snake()
 
 
 def window_sweeper():
@@ -94,7 +94,7 @@ class Map:
         self.fps = 60
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode(size)
-        pygame.display.set_caption("Adventures with mini")
+        pygame.display.set_caption("Better together")
         icon = load_image("images/icon.jpg")
         pygame.display.set_icon(icon)
 
@@ -120,16 +120,11 @@ class Map:
 
             if pygame.sprite.collide_mask(self.players, self.memory):
                 window_memory()
-                self.players.x = 300
-                self.players.y = 300
             elif pygame.sprite.collide_mask(self.players, self.snake):
+                running = False
                 window_snake()
-                self.players.x = 300
-                self.players.y = 300
             elif pygame.sprite.collide_mask(self.players, self.sweeper):
                 window_sweeper()
-                self.players.x = 300
-                self.players.y = 300
 
             self.players_sprite.update()
             # Отрисовка
@@ -142,6 +137,3 @@ class Map:
 
         pygame.quit()
         sys.exit()
-
-
-Map()
