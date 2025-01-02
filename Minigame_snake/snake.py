@@ -155,7 +155,7 @@ class Snake:
             self.fps.tick(self.speed)
 
 
-def play():
+def play_snake():
     pygame.init()
     running = True
     while running:
