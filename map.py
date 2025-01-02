@@ -120,16 +120,11 @@ class Map:
 
             if pygame.sprite.collide_mask(self.players, self.memory):
                 window_memory()
-                self.players.x = 300
-                self.players.y = 300
             elif pygame.sprite.collide_mask(self.players, self.snake):
+                running = False
                 window_snake()
-                self.players.x = 300
-                self.players.y = 300
             elif pygame.sprite.collide_mask(self.players, self.sweeper):
                 window_sweeper()
-                self.players.x = 300
-                self.players.y = 300
 
             self.players_sprite.update()
             # Отрисовка
@@ -142,6 +137,3 @@ class Map:
 
         pygame.quit()
         sys.exit()
-
-
-Map()

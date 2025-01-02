@@ -6,6 +6,11 @@ import pygame
 from load_image import load_image
 from map import Map
 
+import pygame
+
+from load_image import load_image
+from map import Map
+
 
 class StartWindow:
     def __init__(self, size):
