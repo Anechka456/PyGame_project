@@ -1,6 +1,9 @@
-import pygame
-import sys
 import sqlite3
+import sys
+
+import pygame
+
+import map
 
 
 def finding_best_score():
@@ -87,8 +90,7 @@ class FinalWindowSnake:
                     if self.try_again_button.collidepoint(event.pos):
                         self.running = False
                     elif self.exit_button.collidepoint(event.pos):
-                        pygame.quit()
-                        sys.exit()
+                        map.Map()
 
             self.screen.fill(self.background_color)
             self.draw_title()

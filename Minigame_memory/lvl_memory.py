@@ -3,6 +3,7 @@ import sys
 import pygame
 
 import Minigame_memory.memory
+import map
 
 
 class LevelWindow:
@@ -23,6 +24,7 @@ class LevelWindow:
             {"rect": pygame.Rect(100, 200, 700, 100), "text": "1 уровень"},
             {"rect": pygame.Rect(100, 400, 700, 100), "text": "2 уровень"},
             {"rect": pygame.Rect(100, 600, 700, 100), "text": "3 уровень"},
+            {"rect": pygame.Rect(830, 20, 50, 50), "text": "X"},
         ]
 
         self.running = True
@@ -60,6 +62,9 @@ class LevelWindow:
                                 if button['text'] == '3 уровень':
                                     self.running = False
                                     Minigame_memory.memory.memory(self.screen, 6)
+                                elif button['text'] == 'X':
+                                    self.running = False
+                                    map.Map()
 
             pygame.display.flip()
 
