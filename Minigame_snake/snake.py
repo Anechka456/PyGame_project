@@ -6,6 +6,23 @@ from Minigame_snake.final_window import FinalWindowSnake
 from load_image import load_image
 
 
+class Food(pygame.sprite.Sprite):
+    image = pygame.transform.scale(load_image('images_snake/apple.png'), (20, 20))
+    def __init__(self, group, coord):
+        super().__init__(group)
+        self.image = Food.image
+        self.rect = self.image.get_rect(topleft=(coord[0], coord[1]))
+        # вычисляем маску для эффективного сравнения
+        self.mask = pygame.mask.from_surface(self.image)
+
+
+class Snake_head(pygame.sprite.Sprite):
+    def __init__(self, group, pos_x, pos_y):
+        super().__init__(group)
+        self.image = pygame.Surface((15, 15))
+        self.rect = pygame.Rect(pos_x, pos_y, 15, 15)
+
+
 class Snake:
     def __init__(self):
         pygame.init()
@@ -25,6 +42,8 @@ class Snake:
         self.blue = pygame.Color(0, 0, 255)
 
         self.fps = pygame.time.Clock()
+        self.food_sprites = pygame.sprite.Group()
+        self.head_sprites = pygame.sprite.Group()
 
         # змейка
         self.snake_pos = [150, 150]
@@ -33,8 +52,8 @@ class Snake:
         # яблоко
         self.food_pos = [random.randrange(110, self.frame_size_x - 200),
                          random.randrange(110, self.frame_size_y - 200)]
-        food_image = load_image('images_snake/apple.png')
-        self.food_image = pygame.transform.scale(food_image, (20, 20))
+        Food(self.food_sprites, self.food_pos)
+        self.food_image = pygame.transform.scale(load_image('images_snake/apple.png'), (20, 20))
         self.food_spawn = True
 
         self.direction = 'RIGHT'
@@ -42,7 +61,7 @@ class Snake:
 
         self.score = 0
         self.running = True
-        self.drawing = True
+        self.drawing = True # флаг отвечающий за отрисовку начального окна
         self.run()
 
     def show_score(self, color, font, size):
@@ -71,7 +90,7 @@ class Snake:
                 elif event.type == pygame.KEYDOWN:
                     if self.drawing:
                         self.drawing = False
-                        self.speed = 25
+                        self.speed = 20
                     else:
                         # W -> Up; S -> Down; A -> Left; D -> Right
                         if event.key == pygame.K_UP or event.key == ord('w'):
@@ -111,17 +130,20 @@ class Snake:
                 self.snake_body.insert(0, list(self.snake_pos))
 
                 # Проверяем условия столкновения
-                if (self.snake_pos[0] <= self.food_pos[0] + 15 <= self.snake_pos[0] + 15 and
-                        self.snake_pos[1] <= self.food_pos[1] + 15 <= self.snake_pos[1] + 15):
+                head = Snake_head(self.head_sprites, self.snake_pos[0], self.snake_pos[1])
+                if pygame.sprite.spritecollideany(head, self.food_sprites):
+                    self.food_sprites.empty()
                     self.score += 1
                     self.food_spawn = False
                 else:
                     self.snake_body.pop()  # Удаляем последний рост, если яблоко не съедено
+                self.head_sprites.empty()
 
                 # Появление яблока
                 if not self.food_spawn:
                     self.food_pos = [random.randrange(110, self.frame_size_x - 200),
                                      random.randrange(110, self.frame_size_y - 200)]
+                    Food(self.food_sprites, self.food_pos)
                 self.food_spawn = True
 
                 # отрисовка
