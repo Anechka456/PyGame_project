@@ -16,7 +16,7 @@ class StartWindow:
         self.font = pygame.font.SysFont('impact', 80)
         self.button_font = pygame.font.SysFont('impact', 39)
 
-        self.start_button = pygame.Rect(width / 2 - width / 2 / 4, height / 2, width / 4, 100)
+        self.start_button = pygame.Rect(width / 2 - width / 2 / 4, height / 2, width / 4, height / 8)
         self.title_game = "Better together"
 
     def draw(self):
@@ -25,8 +25,10 @@ class StartWindow:
         pygame.draw.ellipse(self.screen, (0, 0, 150), self.start_button.inflate(40, 40))
         pygame.draw.ellipse(self.screen, (0, 0, 200), self.start_button.inflate(20, 20))
         pygame.draw.ellipse(self.screen, (0, 0, 255), self.start_button.inflate(0, 0))
-        button_text = self.button_font.render("Начать игру", True, (255, 255, 255))
-        self.screen.blit(button_text, (self.start_button.x + 15, self.start_button.y + 30))
+        button_text = self.button_font.render("НАЧАТЬ ИГРУ", True, (255, 255, 255))
+        w, h = button_text.get_width(), button_text.get_height()
+        self.screen.blit(button_text,
+                         (self.start_button.x + width / 8 - w / 2, self.start_button.y + height / 16 - h / 2))
 
         # Отображаем текст
         title_game = self.font.render(self.title_game, True, (255, 255, 255))
