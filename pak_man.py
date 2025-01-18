@@ -151,7 +151,7 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            if event.type == ENEMY_EVENT_TYPE and game_over:
+            if event.type == ENEMY_EVENT_TYPE and not game_over:
                 game.move_enemy()
         if not game_over:
             game.update_hero()
@@ -159,10 +159,10 @@ def main():
         game.render(screen)
         if game.check_win():
             game_over = True
-            show_message(screen, 'You won')
+            show_message(screen, 'You win')
         if game.check_los():
             game_over = True
-            show_message(screen, 'You lost')
+            show_message(screen, 'You lose')
         pygame.display.flip()
         clock.tick(FPS)
     pygame.quit()
