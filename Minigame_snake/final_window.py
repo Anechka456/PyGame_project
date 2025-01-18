@@ -90,7 +90,7 @@ class FinalWindowSnake:
                     if self.try_again_button.collidepoint(event.pos):
                         self.running = False
                     elif self.exit_button.collidepoint(event.pos):
-                        map.Map()
+                        map.Map(1350, 300)
 
             self.screen.fill(self.background_color)
             self.draw_title()

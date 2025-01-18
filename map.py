@@ -7,35 +7,65 @@ from Minigame_minisweeper.lvl_minisweeper import play_sweeper
 from Minigame_snake.snake import play_snake
 from load_image import load_image
 
+# группы спрайтов
+all_sprites = pygame.sprite.Group()
+tiles_group = pygame.sprite.Group()
+player_group = pygame.sprite.Group()
+barrier_group = pygame.sprite.Group()
+interactive_points = pygame.sprite.Group()
+
+tile_width = tile_height = 50
+
 
 def window_snake():
+    cleaning_sprites()
     play_snake()
 
 
 def window_sweeper():
+    cleaning_sprites()
     play_sweeper()
 
 
 def window_memory():
+    cleaning_sprites()
     play_memory()
 
 
+def cleaning_sprites():
+    all_sprites.empty()
+    tiles_group.empty()
+    player_group.empty()
+    barrier_group.empty()
+    interactive_points.empty()
+
+
 class MinigameSnake(pygame.sprite.Sprite):
-    image = pygame.transform.scale(load_image("images/star.png"), (50, 50))
+    image = pygame.transform.scale(load_image("images/house.png"), (250, 300))
 
     def __init__(self, group, coord):
-        super().__init__(group)
+        super().__init__(group, all_sprites)
         self.image = MinigameSnake.image
+        self.rect = self.image.get_rect(topleft=(coord[0], coord[1]))
+        # вычисляем маску для эффективного сравнения
+        self.mask = pygame.mask.from_surface(self.image)
+
+class MinigameQuest(pygame.sprite.Sprite):
+    image = pygame.transform.scale(load_image("images/school.png"), (300, 300))
+
+    def __init__(self, group, coord):
+        super().__init__(group, all_sprites)
+        self.image = MinigameQuest.image
         self.rect = self.image.get_rect(topleft=(coord[0], coord[1]))
         # вычисляем маску для эффективного сравнения
         self.mask = pygame.mask.from_surface(self.image)
 
 
 class MinigameMemory(pygame.sprite.Sprite):
-    image = pygame.transform.scale(load_image("images/rocket.png"), (200, 200))
+    image = pygame.transform.scale(load_image("images/educational_institution.png"), (500, 400))
 
     def __init__(self, group, coord):
-        super().__init__(group)
+        super().__init__(group, all_sprites)
         self.image = MinigameMemory.image
         self.rect = self.image.get_rect(topleft=(coord[0], coord[1]))
         # вычисляем маску для эффективного сравнения
@@ -43,97 +73,204 @@ class MinigameMemory(pygame.sprite.Sprite):
 
 
 class MinigameSweeper(pygame.sprite.Sprite):
-    image = pygame.transform.scale(load_image("images/book.png"), (80, 80))
+    image = pygame.transform.scale(load_image("images/army.png"), (300, 300))
 
     def __init__(self, group, coord):
-        super().__init__(group)
+        super().__init__(group, all_sprites)
         self.image = MinigameSweeper.image
         self.rect = self.image.get_rect(topleft=(coord[0], coord[1]))
         # вычисляем маску для эффективного сравнения
         self.mask = pygame.mask.from_surface(self.image)
 
 
-class Players(pygame.sprite.Sprite):
-    player_image_bottom = pygame.transform.scale(load_image('images/character.png'), (60, 60))
-    player_image_top = pygame.transform.scale(load_image('images/character_up.png'), (60, 60))
-    player_image_right = pygame.transform.scale(load_image('images/character_right.png'), (60, 60))
-    player_image_left = pygame.transform.scale(load_image('images/character_left.png'), (60, 60))
+class MinigameSpace(pygame.sprite.Sprite):
+    image = pygame.transform.scale(load_image("images/rocket.png"), (430, 500))
 
-    def __init__(self, group):
-        super().__init__(group)
-        self.image = Players.player_image_bottom
-        self.rect = self.image.get_rect()
-        self.rect.x = 0
-        self.rect.y = 0
-        self.rect.center = (900 // 2, 800 // 2)
-        self.player_speed = 5
+    def __init__(self, group, coord):
+        super().__init__(group, all_sprites)
+        self.image = MinigameSpace.image
+        self.rect = self.image.get_rect(topleft=(coord[0], coord[1]))
+        # вычисляем маску для эффективного сравнения
+        self.mask = pygame.mask.from_surface(self.image)
+
+
+class Tile(pygame.sprite.Sprite):
+    tile_images = {
+        'wall': pygame.transform.scale(load_image('images/grass.png'), (50, 50)),
+        'empty1': pygame.transform.scale(load_image('images/grass.png'), (50, 50)),
+        'empty2': pygame.transform.scale(load_image('images/path.png'), (50, 50)),
+        'tree': pygame.transform.scale(load_image('images/tree.png'), (50, 80))
+
+    }
+
+    def __init__(self, tile_type, pos_x, pos_y):
+        super().__init__(tiles_group, all_sprites)
+        self.image = Tile.tile_images[tile_type]
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x, tile_height * pos_y)
+
+
+class Camera:
+    # зададим начальный сдвиг камеры
+    def __init__(self, width, height):
+        self.dx = 0
+        self.dy = 0
+        self.width = width
+        self.height = height
+
+    # сдвинуть объект obj на смещение камеры
+    def apply(self, obj):
+        obj.rect.x += self.dx
+        obj.rect.y += self.dy
+
+    # позиционировать камеру на объекте target
+    def update(self, target):
+        self.dx = -(target.rect.x + target.rect.w // 2 - self.width // 2)
+        self.dy = -(target.rect.y + target.rect.h // 2 - self.height // 2)
+
+
+class Player(pygame.sprite.Sprite):
+    player_image = pygame.transform.scale(load_image('images/character.png'), (35, 70))
+
+    def __init__(self, pos_x, pos_y):
+        super().__init__(player_group, all_sprites)
+        self.image = Player.player_image
+        self.rect = self.image.get_rect().move(pos_x, pos_y)
+        self.cycle_number = 0
+        self.animation_timer = 0
+        self.speed = 100
 
     def update(self, *args):
-        keys = pygame.key.get_pressed()
+        old_x = self.rect.x
+        old_y = self.rect.y
 
         # W -> Up; S -> Down; A -> Left; D -> Right
+        keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            self.image = Players.player_image_left
-            self.rect.x -= self.player_speed
-        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            self.image = Players.player_image_right
-            self.rect.x += self.player_speed
-        if keys[pygame.K_UP] or keys[pygame.K_w]:
-            self.image = Players.player_image_top
-            self.rect.y -= self.player_speed
-        if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-            self.image = Players.player_image_bottom
-            self.rect.y += self.player_speed
+            if self.cycle_number % 2 == 0:
+                self.image = pygame.transform.scale(load_image('images/character_left1.png'), (35, 70))
+            else:
+                self.image = pygame.transform.scale(load_image('images/character_left2.png'), (35, 70))
+            self.animation_timer += 1
+            self.rect.x -= self.speed / 60
+        elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+            if self.cycle_number % 2 == 0:
+                self.image = pygame.transform.flip(
+                    pygame.transform.scale(load_image('images/character_left1.png'), (35, 70)), True, False)
+            else:
+                self.image = pygame.transform.flip(
+                    pygame.transform.scale(load_image('images/character_left2.png'), (35, 70)), True, False)
+            self.animation_timer += 1
+            self.rect.x += self.speed / 60
+        elif keys[pygame.K_UP] or keys[pygame.K_w]:
+            if self.cycle_number % 2 == 0:
+                self.image = pygame.transform.scale(load_image('images/character_up1.png'), (35, 70))
+            else:
+                self.image = pygame.transform.scale(load_image('images/character_up2.png'), (35, 70))
+            self.animation_timer += 1
+            self.rect.y -= self.speed / 60
+        elif keys[pygame.K_DOWN] or keys[pygame.K_s]:
+            if self.cycle_number % 2 == 0:
+                self.image = pygame.transform.scale(load_image('images/character_down1.png'), (35, 70))
+            else:
+                self.image = pygame.transform.scale(load_image('images/character_down2.png'), (35, 70))
+            self.animation_timer += 1
+            self.rect.y += self.speed / 60
+        else:
+            self.image = Player.player_image
+            self.animation_timer = 0
+            self.cycle_number = 0
+            return
+
+        if self.animation_timer % 10 == 0:  # каждые 10 кадров
+            self.cycle_number += 1
+
+        # проверка на коллизию
+        if pygame.sprite.spritecollideany(self, barrier_group):
+            self.rect.x = old_x
+            self.rect.y = old_y
 
 
 class Map:
-    def __init__(self):
-        pygame.init()
+    def __init__(self, x, y):
+        self.FPS = 60
+        self.x = x
+        self.y = y
 
-        size = width, height = 900, 800
-        self.fps = 60
-        self.clock = pygame.time.Clock()
-        self.screen = pygame.display.set_mode(size)
-        pygame.display.set_caption("Better together")
-        icon = load_image("images/icon.jpg")
-        pygame.display.set_icon(icon)
+        # интерактивные точки
+        self.coord_interactive_points = [(60, 500), (1380, 0), (1300, 990), (60, 1530), (1200, 1900)]
 
-        self.background_image = pygame.transform.scale(load_image('images/map.png'), (900, 800))
-        self.interactive_points = pygame.sprite.Group()
-        self.coord_interactive_points = [(80, 580), (150, 100), (700, 400)]
+        self.quest = MinigameQuest(interactive_points, self.coord_interactive_points[0])
+        self.snake = MinigameSnake(interactive_points, self.coord_interactive_points[1])
+        self.sweeper = MinigameSweeper(interactive_points, self.coord_interactive_points[2])
+        self.memory = MinigameMemory(interactive_points, self.coord_interactive_points[3])
+        self.space = MinigameSpace(interactive_points, self.coord_interactive_points[4])
 
-        self.memory = MinigameMemory(self.interactive_points, self.coord_interactive_points[0])
-        self.snake = MinigameSnake(self.interactive_points, self.coord_interactive_points[1])
-        self.sweeper = MinigameSweeper(self.interactive_points, self.coord_interactive_points[2])
+        self.start()
 
-        self.players_sprite = pygame.sprite.Group()
-        self.players = Players(self.players_sprite)
-
-        self.run()
-
-    def run(self):
-        running = True
-        while running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-
-            if pygame.sprite.collide_mask(self.players, self.memory):
-                window_memory()
-            elif pygame.sprite.collide_mask(self.players, self.snake):
-                running = False
-                window_snake()
-            elif pygame.sprite.collide_mask(self.players, self.sweeper):
-                window_sweeper()
-
-            self.players_sprite.update()
-            # Отрисовка
-            self.screen.blit(self.background_image, (0, 0))
-            self.players_sprite.draw(self.screen)
-            self.interactive_points.draw(self.screen)
-
-            pygame.display.flip()
-            self.clock.tick(self.fps)
-
+    def terminate(self):
         pygame.quit()
         sys.exit()
+
+    def load_level(self, filename):
+        filename = "data/" + filename
+        # читаем уровень, убирая символы перевода строки
+        with open(filename, 'r') as mapFile:
+            level_map = [line.strip() for line in mapFile]
+
+        # и подсчитываем максимальную длину
+        max_width = max(map(len, level_map))
+
+        # дополняем каждую строку пустыми клетками ('.')
+        return list(map(lambda x: x.ljust(max_width, '.'), level_map))
+
+    def generate_level(self, level):
+        new_player, x, y = None, None, None
+        for y in range(len(level)):
+            for x in range(len(level[y])):
+                if level[y][x] == '.':
+                    Tile('empty1', x, y)
+                elif level[y][x] == ',':
+                    Tile('empty2', x, y)
+                elif level[y][x] == '#':
+                    wall = Tile('wall', x, y)
+                    barrier_group.add(wall)
+        new_player = Player(self.x, self.y)
+        # вернем игрока, а также размер поля в клетках
+        return new_player, x, y
+
+    def start(self):
+        pygame.init()
+        size = width, height = 900, 800
+        screen = pygame.display.set_mode(size)
+        clock = pygame.time.Clock()
+        camera = Camera(width, height)
+        player, level_x, level_y = self.generate_level(self.load_level('map.txt'))
+
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.terminate()
+                elif event.type == pygame.KEYDOWN:
+                    player.update(event)
+
+            if pygame.sprite.collide_mask(player, self.memory):
+                window_memory()
+
+            elif pygame.sprite.collide_mask(player, self.snake):
+                window_snake()
+
+            elif pygame.sprite.collide_mask(player, self.sweeper):
+                window_sweeper()
+
+            player.update()
+            camera.update(player)
+            for sprite in all_sprites:
+                camera.apply(sprite)
+            screen.fill((87, 132, 84))
+            tiles_group.draw(screen)
+            interactive_points.draw(screen)
+            player_group.draw(screen)
+            pygame.display.flip()
+            clock.tick(self.FPS)
+

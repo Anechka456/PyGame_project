@@ -64,7 +64,7 @@ class LevelWindow:
                                     Minigame_memory.memory.memory(self.screen, 6)
                                 elif button['text'] == 'X':
                                     self.running = False
-                                    map.Map()
+                                    map.Map(500, 1800)
 
             pygame.display.flip()
 

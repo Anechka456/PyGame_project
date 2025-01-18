@@ -48,7 +48,7 @@ class StartWindow:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         if self.start_button.collidepoint(event.pos):
-                            Map()
+                            Map(1350, 300)
 
             self.draw()
 
