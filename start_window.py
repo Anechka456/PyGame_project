@@ -33,7 +33,8 @@ class StartWindow:
         # Отображаем текст
         title_game = self.font.render(self.title_game, True, (255, 255, 255))
 
-        self.screen.blit(title_game, (200, 100))
+
+        self.screen.blit(title_game, (width // 2 - title_game.get_width() // 2, 100))
 
         pygame.display.flip()
 
