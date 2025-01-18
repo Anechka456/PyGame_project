@@ -64,7 +64,7 @@ class LevelWindow:
                                     Play(15, 15)
                                 elif button['text'] == 'X':
                                     self.running = False
-                                    map.Map()
+                                    map.Map(1250, 1250)
 
             pygame.display.flip()
 
