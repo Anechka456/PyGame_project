@@ -75,7 +75,7 @@ class Hero:
 class Enemy:
     def __init__(self, position):
         self.x, self.y = position
-        self.delay = 100
+        self.delay = 200
         pygame.time.set_timer(ENEMY_EVENT_TYPE, self.delay)
 
     def get_position(self):
