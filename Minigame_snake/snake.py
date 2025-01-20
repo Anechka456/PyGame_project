@@ -52,7 +52,7 @@ class Snake:
         # яблоко
         self.food_pos = [random.randrange(110, self.frame_size_x - 200),
                          random.randrange(110, self.frame_size_y - 200)]
-        Food(self.food_sprites, self.food_pos)
+        self.apple = Food(self.food_sprites, self.food_pos)
         self.food_image = pygame.transform.scale(load_image('images_snake/apple.png'), (20, 20))
         self.food_spawn = True
 
@@ -131,8 +131,7 @@ class Snake:
 
                 # Проверяем условия столкновения
                 head = Snake_head(self.head_sprites, self.snake_pos[0], self.snake_pos[1])
-                if pygame.sprite.spritecollideany(head, self.food_sprites):
-                    self.food_sprites.empty()
+                if pygame.sprite.collide_mask(head, self.apple):
                     self.score += 1
                     self.food_spawn = False
                 else:
@@ -143,7 +142,7 @@ class Snake:
                 if not self.food_spawn:
                     self.food_pos = [random.randrange(110, self.frame_size_x - 200),
                                      random.randrange(110, self.frame_size_y - 200)]
-                    Food(self.food_sprites, self.food_pos)
+                    self.apple = Food(self.food_sprites, self.food_pos)
                 self.food_spawn = True
 
                 # отрисовка
