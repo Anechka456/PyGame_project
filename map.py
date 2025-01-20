@@ -5,6 +5,7 @@ import pygame
 from Minigame_memory.lvl_memory import play_memory
 from Minigame_minisweeper.lvl_minisweeper import play_sweeper
 from Minigame_snake.snake import play_snake
+from Minigame_space import space
 from load_image import load_image
 
 # группы спрайтов
@@ -32,6 +33,11 @@ def window_memory():
     play_memory()
 
 
+def window_space():
+    cleaning_sprites()
+    space.play_space()
+
+
 def cleaning_sprites():
     all_sprites.empty()
     tiles_group.empty()
@@ -50,12 +56,13 @@ class MinigameSnake(pygame.sprite.Sprite):
         # вычисляем маску для эффективного сравнения
         self.mask = pygame.mask.from_surface(self.image)
 
-class MinigameQuest(pygame.sprite.Sprite):
+
+class MinigamePacMan(pygame.sprite.Sprite):
     image = pygame.transform.scale(load_image("images/school.png"), (300, 300))
 
     def __init__(self, group, coord):
         super().__init__(group, all_sprites)
-        self.image = MinigameQuest.image
+        self.image = MinigamePacMan.image
         self.rect = self.image.get_rect(topleft=(coord[0], coord[1]))
         # вычисляем маску для эффективного сравнения
         self.mask = pygame.mask.from_surface(self.image)
@@ -193,14 +200,15 @@ class Player(pygame.sprite.Sprite):
 
 class Map:
     def __init__(self, x, y):
-        self.FPS = 60
+        pygame.display.set_caption("Better together")
+
         self.x = x
         self.y = y
 
         # интерактивные точки
         self.coord_interactive_points = [(60, 500), (1380, 0), (1300, 990), (60, 1530), (1200, 1900)]
 
-        self.quest = MinigameQuest(interactive_points, self.coord_interactive_points[0])
+        self.pac_man = MinigamePacMan(interactive_points, self.coord_interactive_points[0])
         self.snake = MinigameSnake(interactive_points, self.coord_interactive_points[1])
         self.sweeper = MinigameSweeper(interactive_points, self.coord_interactive_points[2])
         self.memory = MinigameMemory(interactive_points, self.coord_interactive_points[3])
@@ -244,6 +252,7 @@ class Map:
         size = width, height = 900, 800
         screen = pygame.display.set_mode(size)
         clock = pygame.time.Clock()
+        fps = 60
         camera = Camera(width, height)
         player, level_x, level_y = self.generate_level(self.load_level('map.txt'))
 
@@ -263,6 +272,9 @@ class Map:
             elif pygame.sprite.collide_mask(player, self.sweeper):
                 window_sweeper()
 
+            elif pygame.sprite.collide_mask(player, self.space):
+                window_space()
+
             player.update()
             camera.update(player)
             for sprite in all_sprites:
@@ -272,5 +284,4 @@ class Map:
             interactive_points.draw(screen)
             player_group.draw(screen)
             pygame.display.flip()
-            clock.tick(self.FPS)
-
+            clock.tick(fps)

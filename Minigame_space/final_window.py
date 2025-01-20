@@ -2,11 +2,12 @@ import sys
 
 import pygame
 
-import Minigame_memory.memory
+import Minigame_space.space
+import map
 
 
-class FinalWindowMemory:
-    def __init__(self, lvl, text):
+class FinalWindowSpace:
+    def __init__(self, text):
         pygame.init()
         width, height = 900, 800
         self.screen = pygame.display.set_mode((width, height))
@@ -28,7 +29,6 @@ class FinalWindowMemory:
         self.exit_button = pygame.Rect((550, height // 2 + button_height * 2),
                                        (button_width, button_height))
 
-        self.lvl = lvl
         self.text = text
 
         self.running = True
@@ -47,7 +47,7 @@ class FinalWindowMemory:
         self.screen.blit(exit_text, (self.exit_button.x + 50, self.exit_button.y + 10))
 
     def draw_title(self):
-        title_text = self.title_font.render('Game Memory', True, self.text_color)  # Заголовок
+        title_text = self.title_font.render('Game Space', True, self.text_color)  # Заголовок
         title_rect = title_text.get_rect(center=(450, 200))
         self.screen.blit(title_text, title_rect)
 
@@ -65,9 +65,10 @@ class FinalWindowMemory:
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.try_again_button.collidepoint(event.pos):
-                        Minigame_memory.memory.memory(self.screen, self.lvl)
+                        Minigame_space.space.Space()
                         self.running = False
                     elif self.exit_button.collidepoint(event.pos):
+                        map.Map(1250, 2200)
                         self.running = False
 
             self.screen.fill(self.background_color)
