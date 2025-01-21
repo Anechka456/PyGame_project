@@ -1,14 +1,14 @@
 import pygame
 
 size = width, height = 480, 480
-FPS = 15
+FPS = 10
 
 MAPS_DIR = "maps"
 TITLE_SIZE = 32
 ENEMY_EVENT_TYPE = 30
 
 
-class laberint:
+class Laberint:
     def __init__(self, filename, free_tile, finish_tile):
         self.map = []
         with open(f"{MAPS_DIR}/{filename}") as input_file:
@@ -21,7 +21,7 @@ class laberint:
         self.finish = finish_tile
 
     def render(self, screen):
-        colors = {0: (0, 0, 0), 1: (120, 120, 120), 2: (50, 50, 50)}
+        colors = {0: (0, 0, 0), 1: (0, 0, 255), 2: (50, 50, 50)}
         for y in range(self.heihgt):
             for x in range(self.wigth):
                 rect = pygame.Rect(x * self.tile_size, y * self.tile_size, self.tile_size, self.tile_size)
@@ -69,7 +69,7 @@ class Hero:
 
     def render(self, screen):
         center = self.x * TITLE_SIZE + TITLE_SIZE // 2, self.y * TITLE_SIZE + TITLE_SIZE // 2
-        pygame.draw.circle(screen, (255, 255, 255), center, TITLE_SIZE / 2)
+        pygame.draw.circle(screen, (255, 255, 0), center, TITLE_SIZE / 2)
 
 
 class Enemy:
@@ -121,7 +121,7 @@ class Game:
         return self.labirint.get_tile_id(self.hero.get_position()) == 2
 
     def check_los(self):
-        return self.hero.get_position() == self.enemy.get_position
+        return self.hero.get_position() == self.enemy.get_position()
 
 
 def show_message(screen, message):
@@ -139,7 +139,7 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode(size)
 
-    labirint = laberint("simple_map.txt", [0, 2], 2)
+    labirint = Laberint("simple_map.txt", [0, 2], 2)
     hero = Hero((7, 7))
     enemy = Enemy((7, 1))
     game = Game(labirint, hero, enemy)
