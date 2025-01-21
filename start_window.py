@@ -11,7 +11,7 @@ class StartWindow:
         pygame.init()
         self.screen = pygame.display.set_mode((size[0], size[1]))
         pygame.display.set_caption("Better together")
-        icon = load_image("images/icon.png")
+        icon = load_image("images/icon.jpg")
         pygame.display.set_icon(icon)
         self.background_image = pygame.transform.scale(load_image('images/startwindow_background.png'), (1250, 800))
         self.font = pygame.font.SysFont('impact', 80)
