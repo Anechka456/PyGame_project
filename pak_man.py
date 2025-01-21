@@ -5,7 +5,7 @@ FPS = 10
 
 MAPS_DIR = "maps"
 TITLE_SIZE = 32
-ENEMY_EVENT_TYPE = 30
+ENEMY_EVENT_TYPE = 1
 
 
 class Laberint:
@@ -139,7 +139,7 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode(size)
 
-    labirint = Laberint("simple_map.txt", [0, 2], 2)
+    labirint = Laberint("simple_map2.txt", [0, 2], 2)
     hero = Hero((7, 7))
     enemy = Enemy((7, 1))
     game = Game(labirint, hero, enemy)
