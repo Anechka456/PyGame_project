@@ -261,9 +261,17 @@ class Play(Board, Sweeper):
                 if self.sweeper.pole[nx][ny] == 'F' and self.sweeper.hidden_field[nx][ny] == '*':
                     continue
                 elif self.sweeper.pole[nx][ny] != 'F' and self.sweeper.hidden_field[nx][ny] == '*':
+                    self.sweeper.game_over()
+                    self.timer_started = False
+                    self.stop_time = (pygame.time.get_ticks() - self.start_ticks) // 1000
+                    self.image_new_game = pygame.transform.scale(
+                        load_image(f"images_sweeper/emoji_died.jpg"),
+                        (50, 40))
+                    self.game_active = False
+                    FinalWindowSweeper(1, self.dictionary_levels[self.x], self.stop_time)
                     return False
                 elif self.sweeper.pole[nx][ny] == 'F' and self.sweeper.hidden_field[nx][ny] != '*':
-                    return False
+                    continue
         return True
 
     def time(self):
