@@ -39,19 +39,19 @@ class FinalWindowSweeper:
             self.screen.fill(self.background_color)
 
             if self.id == 1:
-                self.draw_text('Game over', self.font_title, self.text_color, 270, 200)
-                self.draw_text('Вы наткнулись на бомбу...', self.font, self.text_color, 180, 330)
+                self.draw_text('Game over', self.font_title, self.text_color, 270, 270)
+                self.draw_text('Вы наткнулись на бомбу...', self.font, self.text_color, 180, 400)
             elif self.id == 2:
-                self.draw_text('Поздравляем!', self.font_title, self.text_color, 210, 200)
-                self.draw_text('Вы открыли все', self.font, self.text_color, 270, 330)
-                self.draw_text('безопасные клетки!', self.font, self.text_color, 230, 380)
+                self.draw_text('Поздравляем!', self.font_title, self.text_color, 210, 270)
+                self.draw_text('Вы открыли все', self.font, self.text_color, 270, 400)
+                self.draw_text('безопасные клетки!', self.font, self.text_color, 230, 450)
 
             self.draw_text("Game Minisweeper", self.font_title, self.text_color, 140, 80)
-            self.draw_text(f"Уровень: {self.lvl}", self.font, self.text_color, 335, 460)
+            self.draw_text(f"Уровень: {self.lvl}", self.font, self.text_color, 335, 530)
             minutes = str(self.time // 60).rjust(2, '0')
             seconds = str(self.time % 60).rjust(2, '0')
             self.draw_text(f"Время: {minutes}:{seconds}", self.font, self.text_color,
-                           305, 510)
+                           305, 580)
 
             # Рисуем кнопки
             exit_button = self.draw_button("х", 830, 20, 50, 50)
