@@ -11,8 +11,9 @@ class StartWindow:
         pygame.init()
         self.screen = pygame.display.set_mode((size[0], size[1]))
         pygame.display.set_caption("Better together")
-        icon = load_image("images/icon.jpg")
+        icon = load_image("images/icon.png")
         pygame.display.set_icon(icon)
+        self.background_image = pygame.transform.scale(load_image('images/startwindow_background.png'), (1250, 800))
         self.font = pygame.font.SysFont('impact', 80)
         self.button_font = pygame.font.SysFont('impact', 39)
 
@@ -20,6 +21,7 @@ class StartWindow:
         self.title_game = "Better together"
 
     def draw(self):
+        self.screen.blit(self.background_image, (-100, 0))
 
         # Рисуем овальный фон вокруг кнопки
         pygame.draw.ellipse(self.screen, (0, 0, 150), self.start_button.inflate(40, 40))
