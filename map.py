@@ -145,7 +145,7 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect().move(pos_x, pos_y)
         self.cycle_number = 0
         self.animation_timer = 0
-        self.speed = 100
+        self.speed = 1000
 
     def update(self, *args):
         old_x = self.rect.x
