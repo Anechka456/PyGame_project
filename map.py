@@ -14,6 +14,7 @@ tiles_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
 barrier_group = pygame.sprite.Group()
 interactive_points = pygame.sprite.Group()
+nature_points = pygame.sprite.Group()
 
 tile_width = tile_height = 50
 
@@ -44,58 +45,75 @@ def cleaning_sprites():
     player_group.empty()
     barrier_group.empty()
     interactive_points.empty()
+    nature_points.empty()
 
 
-class MinigameSnake(pygame.sprite.Sprite):
+class MiniGameSnake(pygame.sprite.Sprite):
     image = pygame.transform.scale(load_image("images/house.png"), (250, 300))
 
     def __init__(self, group, coord):
         super().__init__(group, all_sprites)
-        self.image = MinigameSnake.image
+        self.image = MiniGameSnake.image
         self.rect = self.image.get_rect(topleft=(coord[0], coord[1]))
         # вычисляем маску для эффективного сравнения
         self.mask = pygame.mask.from_surface(self.image)
 
 
-class MinigamePacMan(pygame.sprite.Sprite):
+class MiniGamePacMan(pygame.sprite.Sprite):
     image = pygame.transform.scale(load_image("images/school.png"), (300, 300))
 
     def __init__(self, group, coord):
         super().__init__(group, all_sprites)
-        self.image = MinigamePacMan.image
+        self.image = MiniGamePacMan.image
         self.rect = self.image.get_rect(topleft=(coord[0], coord[1]))
         # вычисляем маску для эффективного сравнения
         self.mask = pygame.mask.from_surface(self.image)
 
 
-class MinigameMemory(pygame.sprite.Sprite):
+class MiniGameMemory(pygame.sprite.Sprite):
     image = pygame.transform.scale(load_image("images/educational_institution.png"), (500, 400))
 
     def __init__(self, group, coord):
         super().__init__(group, all_sprites)
-        self.image = MinigameMemory.image
+        self.image = MiniGameMemory.image
         self.rect = self.image.get_rect(topleft=(coord[0], coord[1]))
         # вычисляем маску для эффективного сравнения
         self.mask = pygame.mask.from_surface(self.image)
 
 
-class MinigameSweeper(pygame.sprite.Sprite):
+class MiniGameSweeper(pygame.sprite.Sprite):
     image = pygame.transform.scale(load_image("images/army.png"), (300, 300))
 
     def __init__(self, group, coord):
         super().__init__(group, all_sprites)
-        self.image = MinigameSweeper.image
+        self.image = MiniGameSweeper.image
         self.rect = self.image.get_rect(topleft=(coord[0], coord[1]))
         # вычисляем маску для эффективного сравнения
         self.mask = pygame.mask.from_surface(self.image)
 
 
-class MinigameSpace(pygame.sprite.Sprite):
+class MiniGameSpace(pygame.sprite.Sprite):
     image = pygame.transform.scale(load_image("images/rocket.png"), (430, 500))
 
     def __init__(self, group, coord):
         super().__init__(group, all_sprites)
-        self.image = MinigameSpace.image
+        self.image = MiniGameSpace.image
+        self.rect = self.image.get_rect(topleft=(coord[0], coord[1]))
+        # вычисляем маску для эффективного сравнения
+        self.mask = pygame.mask.from_surface(self.image)
+
+
+class Nature(pygame.sprite.Sprite):
+    nature_images = {
+        'tree1': pygame.transform.scale(load_image('images/tree1.png'), (200, 200)),
+        'tree2': pygame.transform.scale(load_image('images/tree2.png'), (150, 200)),
+        'tree3': pygame.transform.scale(load_image('images/tree3.png'), (250, 250))
+
+    }
+
+    def __init__(self, tile_type, coord):
+        super().__init__(nature_points, all_sprites)
+        self.image = Nature.nature_images[tile_type]
         self.rect = self.image.get_rect(topleft=(coord[0], coord[1]))
         # вычисляем маску для эффективного сравнения
         self.mask = pygame.mask.from_surface(self.image)
@@ -105,8 +123,7 @@ class Tile(pygame.sprite.Sprite):
     tile_images = {
         'wall': pygame.transform.scale(load_image('images/grass.png'), (50, 50)),
         'empty1': pygame.transform.scale(load_image('images/grass.png'), (50, 50)),
-        'empty2': pygame.transform.scale(load_image('images/path.png'), (50, 50)),
-        'tree': pygame.transform.scale(load_image('images/tree.png'), (50, 80))
+        'empty2': pygame.transform.scale(load_image('images/path.png'), (50, 50))
 
     }
 
@@ -197,6 +214,11 @@ class Player(pygame.sprite.Sprite):
             self.rect.x = old_x
             self.rect.y = old_y
 
+        for i in nature_points:
+            if pygame.sprite.collide_mask(self, i):
+                self.rect.x = old_x
+                self.rect.y = old_y
+
 
 class Map:
     def __init__(self, x, y):
@@ -208,11 +230,20 @@ class Map:
         # интерактивные точки
         self.coord_interactive_points = [(60, 500), (1380, 0), (1300, 990), (60, 1530), (1200, 1900)]
 
-        self.pac_man = MinigamePacMan(interactive_points, self.coord_interactive_points[0])
-        self.snake = MinigameSnake(interactive_points, self.coord_interactive_points[1])
-        self.sweeper = MinigameSweeper(interactive_points, self.coord_interactive_points[2])
-        self.memory = MinigameMemory(interactive_points, self.coord_interactive_points[3])
-        self.space = MinigameSpace(interactive_points, self.coord_interactive_points[4])
+        # точки деревьев
+        coord_tree = [('tree1', (80, 80)), ('tree2', (550, 300)), ('tree1', (900, 30)), ('tree3', (1100, 50)),
+                      ('tree3', (1100, 700)), ('tree1', (1350, 500)), ('tree2', (730, 250)), ('tree2', (350, 400)),
+                      ('tree2', (400, 200)), ('tree2', (800, 750)), ('tree2', (60, 1100)), ('tree1', (300, 1200)),
+                      ('tree3', (650, 1250)), ('tree1', (1050, 1700)), ('tree3', (1350, 1500)), ('tree3', (200, 2000)),
+                      ('tree1', (600, 2200))]
+        for i in coord_tree:
+            Nature(i[0], i[1])
+
+        self.pac_man = MiniGamePacMan(interactive_points, self.coord_interactive_points[0])
+        self.snake = MiniGameSnake(interactive_points, self.coord_interactive_points[1])
+        self.sweeper = MiniGameSweeper(interactive_points, self.coord_interactive_points[2])
+        self.memory = MiniGameMemory(interactive_points, self.coord_interactive_points[3])
+        self.space = MiniGameSpace(interactive_points, self.coord_interactive_points[4])
 
         self.start()
 
@@ -282,6 +313,7 @@ class Map:
             screen.fill((87, 132, 84))
             tiles_group.draw(screen)
             interactive_points.draw(screen)
+            nature_points.draw(screen)
             player_group.draw(screen)
             pygame.display.flip()
             clock.tick(fps)
