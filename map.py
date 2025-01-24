@@ -40,6 +40,7 @@ def window_space():
 
 
 def cleaning_sprites():
+    """Функция очищает группы спрайтов"""
     all_sprites.empty()
     tiles_group.empty()
     player_group.empty()
@@ -107,7 +108,8 @@ class Nature(pygame.sprite.Sprite):
     nature_images = {
         'tree1': pygame.transform.scale(load_image('images/tree1.png'), (200, 200)),
         'tree2': pygame.transform.scale(load_image('images/tree2.png'), (150, 200)),
-        'tree3': pygame.transform.scale(load_image('images/tree3.png'), (250, 250))
+        'tree3': pygame.transform.scale(load_image('images/tree3.png'), (250, 250)),
+        'field': pygame.transform.scale(load_image('images/field.png'), (400, 400))
 
     }
 
@@ -231,9 +233,9 @@ class Map:
         self.coord_interactive_points = [(60, 500), (1380, 0), (1300, 990), (60, 1530), (1200, 1900)]
 
         # точки деревьев
-        coord_tree = [('tree1', (80, 80)), ('tree2', (550, 300)), ('tree1', (900, 30)), ('tree3', (1100, 50)),
-                      ('tree3', (1100, 700)), ('tree1', (1350, 500)), ('tree2', (730, 250)), ('tree2', (350, 400)),
-                      ('tree2', (400, 200)), ('tree2', (800, 750)), ('tree2', (60, 1100)), ('tree1', (300, 1200)),
+        coord_tree = [('field', (300, 50)), ('tree1', (80, 80)), ('tree2', (550, 350)), ('tree1', (900, 30)),
+                      ('tree3', (1100, 50)), ('tree3', (1100, 700)), ('tree1', (1350, 500)), ('tree2', (730, 250)),
+                      ('tree2', (350, 400)), ('tree2', (800, 750)), ('tree2', (60, 1100)), ('tree1', (300, 1200)),
                       ('tree3', (650, 1250)), ('tree1', (1050, 1700)), ('tree3', (1350, 1500)), ('tree3', (200, 2000)),
                       ('tree1', (600, 2200))]
         for i in coord_tree:
