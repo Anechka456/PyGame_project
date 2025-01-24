@@ -10,7 +10,7 @@ BLACK = (0, 0, 0)
 GRAY = (200, 200, 200)
 
 # Размеры окна
-WIDTH, HEIGHT = 400, 300
+WIDTH, HEIGHT = 900, 800
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Регистрация")
 
