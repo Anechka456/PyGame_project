@@ -6,6 +6,7 @@ import pygame
 from Minigame_space import final_window
 from load_image import load_image
 
+# группы спрайтов
 all_sprites = pygame.sprite.Group()
 alien_sprites = pygame.sprite.Group()
 platforms_sprites = pygame.sprite.Group()
@@ -23,9 +24,77 @@ def game_over():
 
 
 def cleaning_sprites():
+    """Функция очищает группы спрайтов"""
     all_sprites.empty()
     alien_sprites.empty()
     platforms_sprites.empty()
+
+
+def terminate():
+    pygame.quit()
+    sys.exit()
+
+
+def start_screen(screen):
+    intro_text = ["Первый полёт Андрияна Николаева в космос",
+                  "состоялся 11 августа 1962 года на корабле «Восток-3».",
+                  "Продолжительность полёта составила 4 суток.",
+                  "За это время «Восток-3» сумел облететь вокруг Земли 64 раза.",
+                  "Это был первый рекорд по длительности полёта.",
+                  "2 Второй полёт Андрияна Николаева состоялся",
+                  "1 июня 1970 года совместно с космонавтом",
+                  "Виталием Севастьяновым на корабле «Восток-9».",
+                  "Полет длился 18 суток. Космонавты пробыли",
+                  "на орбите 424 часа 59 минут и совершили",
+                  "286 оборотов вокруг Земли"
+                  ]
+
+    # Создание списка звезд
+    stars = []
+    for _ in range(200):
+        x = random.randint(0, 900)
+        y = random.randint(0, 800)
+        stars.append((x, y, random.randint(1, 3)))  # (x, y, размер)
+
+    def draw_stars():
+        """Функция рисует звезды"""
+        for star in stars:
+            x, y, size = star
+            # Случайное мерцание звезд
+            brightness = random.randint(100, 255)
+            pygame.draw.circle(screen, (brightness, brightness, brightness), (x, y), size)
+
+    def draw_text():
+        """Функция рисует текст"""
+        font = pygame.font.SysFont('impact', 30)
+        text_coord = 20
+        for line in intro_text:
+            string_rendered = font.render(line, 1, (102, 0, 255))
+            intro_rect = string_rendered.get_rect()
+            text_coord += 10
+            intro_rect.top = text_coord
+            intro_rect.x = 10
+            text_coord += intro_rect.height
+            screen.blit(string_rendered, intro_rect)
+
+    def draw_images():
+        """Функция вставляет картинку"""
+        images = pygame.transform.scale(load_image('data_space/astronaut.png'), (300, 500))
+        screen.blit(images, (600, 300))
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.KEYDOWN or \
+                    event.type == pygame.MOUSEBUTTONDOWN:
+                return  # начинаем игру
+        screen.fill((0, 0, 0))
+        draw_stars()
+        draw_text()
+        draw_images()
+        pygame.display.flip()
+        pygame.time.delay(100)  # Задержка для изменения "мерцания"
 
 
 class Alien(pygame.sprite.Sprite):
@@ -85,9 +154,11 @@ class Spaceship(pygame.sprite.Sprite):
 
         # A -> Left; D -> Right
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            self.rect.x -= self.speed
+            if self.rect.x > -110:
+                self.rect.x -= self.speed
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            self.rect.x += self.speed
+            if self.rect.x < 710:
+                self.rect.x += self.speed
 
 
 class Platforms(pygame.sprite.Sprite):
@@ -143,6 +214,9 @@ class Space:
 def play_space():
     pygame.init()
     running = True
+    size = width, height = 900, 800
+    screen = pygame.display.set_mode(size)
+    start_screen(screen)
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
