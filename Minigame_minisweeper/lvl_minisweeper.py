@@ -56,7 +56,7 @@ def start_screen(screen):
 
     def draw_images():
         """Функция вставляет картинку"""
-        images = pygame.transform.scale(load_image('images_snake/Andreika.png'), (300, 500))
+        images = pygame.transform.scale(load_image('images_sweeper/uno.png'), (300, 500))
         screen.blit(images, (600, 300))
 
 
