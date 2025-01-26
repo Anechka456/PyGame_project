@@ -9,7 +9,6 @@ from Minigame_space import space
 from load_image import load_image
 
 pygame.mixer.init()
-channel = pygame.mixer.Channel(0)
 
 # группы спрайтов
 all_sprites = pygame.sprite.Group()
@@ -307,22 +306,22 @@ class Map:
                     player.update(event)
 
             if pygame.sprite.collide_mask(player, self.memory):
-                Player.sound_walking.set_volume(0)
+                Player.sound_walking.stop()
                 window_memory()
                 terminate()
 
             elif pygame.sprite.collide_mask(player, self.snake):
-                Player.sound_walking.set_volume(0)
+                Player.sound_walking.stop()
                 window_snake()
                 terminate()
 
             elif pygame.sprite.collide_mask(player, self.sweeper):
-                Player.sound_walking.set_volume(0)
+                Player.sound_walking.stop()
                 window_sweeper()
                 terminate()
 
             elif pygame.sprite.collide_mask(player, self.space):
-                Player.sound_walking.set_volume(0)
+                Player.sound_walking.stop()
                 window_space()
                 terminate()
 
