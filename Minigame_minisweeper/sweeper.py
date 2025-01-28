@@ -218,10 +218,17 @@ class Board:
 class Play(Board, Sweeper):
     def __init__(self, width, height):
         super().__init__(width, height)
+
+        pygame.init()
+        pygame.mixer.init()
+        self.sound_flag = pygame.mixer.Sound('data/images_sweeper/tick.mp3')
+        self.sound_win = pygame.mixer.Sound('data/images_sweeper/win.mp3')
+        self.sound_lose = pygame.mixer.Sound('data/images_sweeper/lose.mp3')
+        self.sound_click = pygame.mixer.Sound('data/images_sweeper/click.mp3')
+
         self.sweeper = Sweeper(width, height)
         self.x = width
         self.y = height
-        pygame.init()
         self.size = width, height = 900, 800
         self.screen = pygame.display.set_mode((width, height))
         self.screen2 = pygame.Surface((500, 600))
@@ -261,17 +268,10 @@ class Play(Board, Sweeper):
                 if self.sweeper.pole[nx][ny] == 'F' and self.sweeper.hidden_field[nx][ny] == '*':
                     continue
                 elif self.sweeper.pole[nx][ny] != 'F' and self.sweeper.hidden_field[nx][ny] == '*':
-                    self.sweeper.game_over()
-                    self.timer_started = False
-                    self.stop_time = (pygame.time.get_ticks() - self.start_ticks) // 1000
-                    self.image_new_game = pygame.transform.scale(
-                        load_image(f"images_sweeper/emoji_died.jpg"),
-                        (50, 40))
-                    self.game_active = False
-                    FinalWindowSweeper(1, self.dictionary_levels[self.x], self.stop_time)
+                    self.game_over()
                     return False
                 elif self.sweeper.pole[nx][ny] == 'F' and self.sweeper.hidden_field[nx][ny] != '*':
-                    continue
+                    return False
         return True
 
     def time(self):
@@ -307,6 +307,24 @@ class Play(Board, Sweeper):
         self.sweeper = Sweeper(self.x, self.y)
         self.game_active = True
 
+    def game_over(self):
+        self.sound_lose.play()
+        self.sweeper.game_over()
+        self.timer_started = False
+        self.stop_time = (pygame.time.get_ticks() - self.start_ticks) // 1000
+        self.image_new_game = pygame.transform.scale(
+            load_image(f"images_sweeper/emoji_died.jpg"),
+            (50, 40))
+        self.game_active = False
+        FinalWindowSweeper(1, self.dictionary_levels[self.x], self.stop_time)
+
+    def game_win(self):
+        self.sound_win.play()
+        self.timer_started = False
+        self.stop_time = (pygame.time.get_ticks() - self.start_ticks) // 1000
+        self.game_active = False
+        FinalWindowSweeper(2, self.dictionary_levels[self.x], self.stop_time)
+
     def draw_button(self):
         self.screen.blit(self.image_new_game, self.new_game_button)
 
@@ -324,10 +342,7 @@ class Play(Board, Sweeper):
                     if 0 <= nx < self.y and 0 <= ny < self.x:
                         self.sweeper.open_cell((nx, ny))
                 if self.sweeper.check_win():
-                    self.timer_started = False
-                    self.stop_time = (pygame.time.get_ticks() - self.start_ticks) // 1000
-                    self.game_active = False
-                    FinalWindowSweeper(2, self.dictionary_levels[self.x], self.stop_time)
+                    self.game_win()
 
     def clicking_left(self, coord):
         if self.game_active:
@@ -336,23 +351,14 @@ class Play(Board, Sweeper):
                 self.timer_started = True
                 self.start_ticks = pygame.time.get_ticks()  # Получаем текущее время в миллисекундах
             if self.sweeper.pole[coord[0]][coord[1]] != 'F':
+                self.sound_click.play()
                 if self.sweeper.hidden_field[coord[0]][coord[1]] != '*':
                     self.sweeper.open_cell((coord[0], coord[1]))
                 else:
-                    self.sweeper.game_over()
-                    self.timer_started = False
-                    self.stop_time = (pygame.time.get_ticks() - self.start_ticks) // 1000
-                    self.image_new_game = pygame.transform.scale(
-                        load_image(f"images_sweeper/emoji_died.jpg"),
-                        (50, 40))
-                    self.game_active = False
-                    FinalWindowSweeper(1, self.dictionary_levels[self.x], self.stop_time)
+                    self.game_over()
             if self.game_active:
                 if self.sweeper.check_win():
-                    self.timer_started = False
-                    self.stop_time = (pygame.time.get_ticks() - self.start_ticks) // 1000
-                    self.game_active = False
-                    FinalWindowSweeper(2, self.dictionary_levels[self.x], self.stop_time)
+                    self.game_win()
 
     def clicking_right(self, coord):
         if self.game_active:
@@ -362,6 +368,7 @@ class Play(Board, Sweeper):
                 self.sweeper.open_flag_cell((coord[0], coord[1]))
             else:
                 if self.sweeper.pole[coord[0]][coord[1]] == []:
+                    self.sound_flag.play()
                     self.sweeper.number_bomb -= 1
                     self.sweeper.points_flag.append((coord[0], coord[1]))
                     self.sweeper.flag_cell((coord[0], coord[1]))
