@@ -224,7 +224,8 @@ class Play(Board, Sweeper):
         self.sound_flag = pygame.mixer.Sound('data/images_sweeper/tick.mp3')
         self.sound_win = pygame.mixer.Sound('data/images_sweeper/win.mp3')
         self.sound_lose = pygame.mixer.Sound('data/images_sweeper/lose.mp3')
-        self.sound_click = pygame.mixer.Sound('data/images_sweeper/click.mp3')
+        self.sound_open_cell = pygame.mixer.Sound('data/images_sweeper/click.mp3')
+        self.sound_click = pygame.mixer.Sound('data/images/click.mp3')
 
         self.sweeper = Sweeper(width, height)
         self.x = width
@@ -351,7 +352,7 @@ class Play(Board, Sweeper):
                 self.timer_started = True
                 self.start_ticks = pygame.time.get_ticks()  # Получаем текущее время в миллисекундах
             if self.sweeper.pole[coord[0]][coord[1]] != 'F':
-                self.sound_click.play()
+                self.sound_open_cell.play()
                 if self.sweeper.hidden_field[coord[0]][coord[1]] != '*':
                     self.sweeper.open_cell((coord[0], coord[1]))
                 else:
@@ -393,8 +394,10 @@ class Play(Board, Sweeper):
                         if coord:
                             self.clicking_left(coord)
                         elif self.exit_button.collidepoint(mouse_pos):
+                            self.sound_click.play()
                             self.running = False
                         elif self.new_game_button.collidepoint(mouse_pos):
+                            self.sound_click.play()
                             self.new_game()
 
                     elif event.button == 3:

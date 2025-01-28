@@ -8,6 +8,9 @@ import Minigame_memory.memory
 class FinalWindowMemory:
     def __init__(self, lvl, text):
         pygame.init()
+        pygame.mixer.init()
+        self.sound_click = pygame.mixer.Sound('data/images/click.mp3')
+
         width, height = 900, 800
         self.screen = pygame.display.set_mode((width, height))
 
@@ -65,9 +68,11 @@ class FinalWindowMemory:
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.try_again_button.collidepoint(event.pos):
+                        self.sound_click.play()
                         Minigame_memory.memory.memory(self.screen, self.lvl)
                         self.running = False
                     elif self.exit_button.collidepoint(event.pos):
+                        self.sound_click.play()
                         self.running = False
 
             self.screen.fill(self.background_color)

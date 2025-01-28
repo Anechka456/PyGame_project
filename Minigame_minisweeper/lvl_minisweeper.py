@@ -78,6 +78,8 @@ def start_screen(screen):
 class LevelWindow:
     def __init__(self):
         pygame.init()
+        pygame.mixer.init()
+        self.sound_click = pygame.mixer.Sound('data/images/click.mp3')
 
         self.width, self.height = 900, 800
         self.screen = pygame.display.set_mode((self.width, self.height))
@@ -120,6 +122,7 @@ class LevelWindow:
                         mouse_pos = event.pos
                         for button in self.buttons:
                             if button["rect"].collidepoint(mouse_pos):
+                                self.sound_click.play()
                                 # Обработка нажатия кнопки
                                 if button['text'] == '1 уровень':
                                     self.running = False

@@ -9,6 +9,9 @@ from map import Map
 class StartWindow:
     def __init__(self, size):
         pygame.init()
+        pygame.mixer.init()
+        self.sound_click = pygame.mixer.Sound('data/images/click.mp3')
+
         self.screen = pygame.display.set_mode((size[0], size[1]))
         pygame.display.set_caption("Better together")
         icon = load_image("images/icon.png")
@@ -50,6 +53,7 @@ class StartWindow:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         if self.start_button.collidepoint(event.pos):
+                            self.sound_click.play()
                             Map(1350, 300)
 
             self.draw()
