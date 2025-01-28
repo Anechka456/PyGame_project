@@ -9,6 +9,9 @@ import map
 class FinalWindowSpace:
     def __init__(self, text):
         pygame.init()
+        pygame.mixer.init()
+        self.sound_click = pygame.mixer.Sound('data/images/click.mp3')
+
         width, height = 900, 800
         self.screen = pygame.display.set_mode((width, height))
 
@@ -65,9 +68,11 @@ class FinalWindowSpace:
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.try_again_button.collidepoint(event.pos):
+                        self.sound_click.play()
                         Minigame_space.space.Space()
                         self.running = False
                     elif self.exit_button.collidepoint(event.pos):
+                        self.sound_click.play()
                         map.Map(1250, 2200)
                         self.running = False
 

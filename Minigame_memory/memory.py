@@ -56,6 +56,10 @@ def memory(screen, n):
     size2 = 700 // n
     size = int(size2 * 0.8)
 
+    pygame.mixer.init()
+    sound_card = pygame.mixer.Sound('data/images_memory/cards.mp3')
+    sound_click = pygame.mixer.Sound('data/images/click.mp3')
+
     cards = []
     for i in range((n ** 2 // 2)):
         cards.extend([MemoryCard(i, size) for _ in range(2)])
@@ -84,7 +88,9 @@ def memory(screen, n):
                 if mx >= 0 and my >= 0 and x < len(board[0]) and y < len(
                         board) and mx % size2 <= size and my % size2 <= size:
                     board[y][x].get_click()
+                    sound_card.play()
             if event.type == pygame.MOUSEBUTTONDOWN and exit_button.collidepoint(event.pos):
+                sound_click.play()
                 running = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_z:

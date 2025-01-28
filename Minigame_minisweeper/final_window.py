@@ -5,6 +5,8 @@ import sys
 class FinalWindowSweeper:
     def __init__(self, indicator, lvl, time):
         pygame.init()
+        pygame.mixer.init()
+        self.sound_click = pygame.mixer.Sound('data/images/click.mp3')
 
         self.size = width, height = 900, 800
         self.background_color = (99, 69, 48)
@@ -22,10 +24,10 @@ class FinalWindowSweeper:
         self.run()
 
     def draw_text(self, text, font, color, x, y):
-        dtext = font.render(text, True, color)
-        dtextrect = dtext.get_rect()
-        dtextrect.topleft = (x, y)
-        self.screen.blit(dtext, dtextrect)
+        draw_text = font.render(text, True, color)
+        draw_text_rect = draw_text.get_rect()
+        draw_text_rect.topleft = (x, y)
+        self.screen.blit(draw_text, draw_text_rect)
 
     def draw_button(self, text, x, y, width, height):
         button_rect = pygame.Rect(x, y, width, height)
@@ -63,5 +65,6 @@ class FinalWindowSweeper:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:  # Левая кнопка мыши
                         if exit_button.collidepoint(event.pos):
+                            self.sound_click.play()
                             self.running = False
             pygame.display.flip()

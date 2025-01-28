@@ -5,8 +5,10 @@ import pygame
 from Minigame_memory.lvl_memory import play_memory
 from Minigame_minisweeper.lvl_minisweeper import play_sweeper
 from Minigame_snake.snake import play_snake
-from Minigame_space import space
+from Minigame_space.space import play_space
 from load_image import load_image
+
+pygame.mixer.init()
 
 # группы спрайтов
 all_sprites = pygame.sprite.Group()
@@ -36,7 +38,7 @@ def window_memory():
 
 def window_space():
     cleaning_sprites()
-    space.play_space()
+    play_space()
 
 
 def cleaning_sprites():
@@ -47,6 +49,24 @@ def cleaning_sprites():
     barrier_group.empty()
     interactive_points.empty()
     nature_points.empty()
+
+
+def load_level(filename):
+    filename = "data/" + filename
+    # читаем уровень, убирая символы перевода строки
+    with open(filename, 'r') as mapFile:
+        level_map = [line.strip() for line in mapFile]
+
+    # и подсчитываем максимальную длину
+    max_width = max(map(len, level_map))
+
+    # дополняем каждую строку пустыми клетками ('.')
+    return list(map(lambda x: x.ljust(max_width, '.'), level_map))
+
+
+def terminate():
+    pygame.quit()
+    sys.exit()
 
 
 class MiniGameSnake(pygame.sprite.Sprite):
@@ -109,7 +129,7 @@ class Nature(pygame.sprite.Sprite):
         'tree1': pygame.transform.scale(load_image('images/tree1.png'), (200, 200)),
         'tree2': pygame.transform.scale(load_image('images/tree2.png'), (150, 200)),
         'tree3': pygame.transform.scale(load_image('images/tree3.png'), (250, 250)),
-        'field': pygame.transform.scale(load_image('images/field.png'), (400, 400))
+        'field': pygame.transform.scale(load_image('images/field.png'), (500, 400))
 
     }
 
@@ -157,6 +177,7 @@ class Camera:
 
 class Player(pygame.sprite.Sprite):
     player_image = pygame.transform.scale(load_image('images/character.png'), (35, 70))
+    sound_walking = pygame.mixer.Sound('data/images/walking.wav')
 
     def __init__(self, pos_x, pos_y):
         super().__init__(player_group, all_sprites)
@@ -164,9 +185,11 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect().move(pos_x, pos_y)
         self.cycle_number = 0
         self.animation_timer = 0
-        self.speed = 1000
+        self.speed = 400
+        Player.sound_walking.play(-1)
 
     def update(self, *args):
+        Player.sound_walking.set_volume(1)
         old_x = self.rect.x
         old_y = self.rect.y
 
@@ -203,6 +226,7 @@ class Player(pygame.sprite.Sprite):
             self.animation_timer += 1
             self.rect.y += self.speed / 60
         else:
+            Player.sound_walking.set_volume(0)
             self.image = Player.player_image
             self.animation_timer = 0
             self.cycle_number = 0
@@ -233,7 +257,7 @@ class Map:
         self.coord_interactive_points = [(60, 500), (1380, 0), (1300, 990), (60, 1530), (1200, 1900)]
 
         # точки деревьев
-        coord_tree = [('field', (300, 50)), ('tree1', (80, 80)), ('tree2', (550, 350)), ('tree1', (900, 30)),
+        coord_tree = [('field', (290, 50)), ('tree1', (80, 80)), ('tree2', (550, 350)), ('tree1', (900, 30)),
                       ('tree3', (1100, 50)), ('tree3', (1100, 700)), ('tree1', (1350, 500)), ('tree2', (730, 250)),
                       ('tree2', (350, 400)), ('tree2', (800, 750)), ('tree2', (60, 1100)), ('tree1', (300, 1200)),
                       ('tree3', (650, 1250)), ('tree1', (1050, 1700)), ('tree3', (1350, 1500)), ('tree3', (200, 2000)),
@@ -248,22 +272,6 @@ class Map:
         self.space = MiniGameSpace(interactive_points, self.coord_interactive_points[4])
 
         self.start()
-
-    def terminate(self):
-        pygame.quit()
-        sys.exit()
-
-    def load_level(self, filename):
-        filename = "data/" + filename
-        # читаем уровень, убирая символы перевода строки
-        with open(filename, 'r') as mapFile:
-            level_map = [line.strip() for line in mapFile]
-
-        # и подсчитываем максимальную длину
-        max_width = max(map(len, level_map))
-
-        # дополняем каждую строку пустыми клетками ('.')
-        return list(map(lambda x: x.ljust(max_width, '.'), level_map))
 
     def generate_level(self, level):
         new_player, x, y = None, None, None
@@ -282,31 +290,40 @@ class Map:
 
     def start(self):
         pygame.init()
+
         size = width, height = 900, 800
         screen = pygame.display.set_mode(size)
         clock = pygame.time.Clock()
         fps = 60
         camera = Camera(width, height)
-        player, level_x, level_y = self.generate_level(self.load_level('map.txt'))
+        player, level_x, level_y = self.generate_level(load_level('map.txt'))
 
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.terminate()
+                    terminate()
                 elif event.type == pygame.KEYDOWN:
                     player.update(event)
 
             if pygame.sprite.collide_mask(player, self.memory):
+                Player.sound_walking.stop()
                 window_memory()
+                terminate()
 
             elif pygame.sprite.collide_mask(player, self.snake):
+                Player.sound_walking.stop()
                 window_snake()
+                terminate()
 
             elif pygame.sprite.collide_mask(player, self.sweeper):
+                Player.sound_walking.stop()
                 window_sweeper()
+                terminate()
 
             elif pygame.sprite.collide_mask(player, self.space):
+                Player.sound_walking.stop()
                 window_space()
+                terminate()
 
             player.update()
             camera.update(player)
