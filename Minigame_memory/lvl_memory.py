@@ -1,9 +1,83 @@
+import random
 import sys
 
 import pygame
 
 import Minigame_memory.memory
 import map
+from load_image import load_image
+
+
+def terminate():
+    pygame.quit()
+    sys.exit()
+
+
+def start_screen(screen):
+    intro_text = ["После армии Андриян Николаев",
+                  "решил продолжить обучение",
+                  "и стал курсантом школы воздушных стрелков",
+                  "действующей в Черниговском военном училище.",
+                  " Отучившись положенный срок,",
+                  "грамотный и дисциплинированный",
+                  "лётчик попал в Подмосковье.",
+                  "Его непосредственным ",
+                  "командиром и наставником",
+                  "стал легендарный ",
+                  "Александр Покрышкин.",
+                  "В 1968 году",
+                  "ему вручили диплом",
+                  "по специальности",
+                  "«Лётчик-инженер-космонавт»",
+                  ]
+
+    # Создание списка звезд
+    stars = []
+    for _ in range(200):
+        x = random.randint(0, 900)
+        y = random.randint(0, 800)
+        stars.append((x, y, random.randint(1, 3)))  # (x, y, размер)
+
+    def draw_stars():
+        """Функция рисует звезды"""
+        for star in stars:
+            x, y, size = star
+            # Случайное мерцание звезд
+            brightness = random.randint(100, 255)
+            pygame.draw.circle(screen, (brightness, brightness, brightness), (x, y), size)
+
+    def draw_text():
+        """Функция рисует текст"""
+        font = pygame.font.SysFont('impact', 30)
+        text_coord = 20
+        for line in intro_text:
+            string_rendered = font.render(line, 1, (102, 0, 255))
+            intro_rect = string_rendered.get_rect()
+            text_coord += 10
+            intro_rect.top = text_coord
+            intro_rect.x = 10
+            text_coord += intro_rect.height
+            screen.blit(string_rendered, intro_rect)
+
+    def draw_images():
+        """Функция вставляет картинку"""
+        images = pygame.transform.scale(load_image('images_memory/cat.png'), (300, 500))
+        screen.blit(images, (600, 300))
+
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.KEYDOWN or \
+                    event.type == pygame.MOUSEBUTTONDOWN:
+                return  # начинаем игру
+        screen.fill((0, 0, 0))
+        draw_stars()
+        draw_text()
+        draw_images()
+        pygame.display.flip()
+        pygame.time.delay(100)  # Задержка для изменения "мерцания"
 
 
 class LevelWindow:
@@ -47,14 +121,12 @@ class LevelWindow:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
+                    terminate()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         mouse_pos = event.pos
                         for button in self.buttons:
                             if button["rect"].collidepoint(mouse_pos):
-                                self.sound_click.play()
                                 # Обработка нажатия кнопки
                                 if button['text'] == '1 уровень':
                                     self.running = False
@@ -75,6 +147,9 @@ class LevelWindow:
 def play_memory():
     pygame.init()
     running = True
+    size = width, height = 900, 800
+    screen = pygame.display.set_mode(size)
+    start_screen(screen)
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
