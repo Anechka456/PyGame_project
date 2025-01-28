@@ -6,6 +6,9 @@ import pygame
 from Minigame_space import final_window
 from load_image import load_image
 
+pygame.mixer.init()
+sound_background = pygame.mixer.Sound('data/data_space/background.wav')
+
 # группы спрайтов
 all_sprites = pygame.sprite.Group()
 alien_sprites = pygame.sprite.Group()
@@ -14,6 +17,7 @@ platforms_sprites = pygame.sprite.Group()
 
 def check_win():
     if not alien_sprites:
+        sound_background.stop()
         cleaning_sprites()
         final_window.FinalWindowSpace('Вы выйграли!')
 
@@ -124,6 +128,7 @@ class Alien(pygame.sprite.Sprite):
 
 class Bullet(pygame.sprite.Sprite):
     image = pygame.transform.scale(load_image("data_space/bullet.png"), (50, 70))
+    sound_explosion = pygame.mixer.Sound('data/data_space/explosion.wav')
 
     def __init__(self, coord):
         super().__init__(all_sprites)
@@ -136,6 +141,7 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.y -= 5
         for i in alien_sprites:
             if pygame.sprite.collide_mask(self, i):
+                Bullet.sound_explosion.play()
                 self.kill()
                 i.kill()
 
@@ -184,6 +190,11 @@ class Space:
 
     def run(self):
         pygame.init()
+
+        self.sound_bullet = pygame.mixer.Sound('data/data_space/laser.wav')
+        self.sound_explosion = pygame.mixer.Sound('data/data_space/explosion.wav')
+        sound_background.play(-1)
+
         size = width, height = 900, 800
         screen = pygame.display.set_mode(size)
         clock = pygame.time.Clock()
@@ -193,13 +204,16 @@ class Space:
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+
                     pygame.quit()
                     sys.exit()
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
+                        self.sound_bullet.play()
                         Bullet((self.spaceship.rect.x, 480))
                     self.spaceship.update(event)
                 elif event.type == pygame.MOUSEBUTTONDOWN:
+                    self.sound_bullet.play()
                     Bullet((self.spaceship.rect.x, 480))
 
             all_sprites.update()

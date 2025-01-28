@@ -5,7 +5,7 @@ import pygame
 from Minigame_memory.lvl_memory import play_memory
 from Minigame_minisweeper.lvl_minisweeper import play_sweeper
 from Minigame_snake.snake import play_snake
-from Minigame_space import space
+from Minigame_space.space import play_space
 from load_image import load_image
 
 pygame.mixer.init()
@@ -38,7 +38,7 @@ def window_memory():
 
 def window_space():
     cleaning_sprites()
-    space.play_space()
+    play_space()
 
 
 def cleaning_sprites():

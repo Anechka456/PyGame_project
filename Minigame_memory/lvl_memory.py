@@ -127,6 +127,7 @@ class LevelWindow:
                         mouse_pos = event.pos
                         for button in self.buttons:
                             if button["rect"].collidepoint(mouse_pos):
+                                self.sound_click.play()
                                 # Обработка нажатия кнопки
                                 if button['text'] == '1 уровень':
                                     self.running = False
