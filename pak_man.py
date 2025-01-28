@@ -1,6 +1,7 @@
 import pygame
+from load_image import load_image
 
-size = width, height = 480, 480
+size = width, height = 900, 800
 FPS = 10
 
 MAPS_DIR = "maps"
@@ -8,23 +9,33 @@ TITLE_SIZE = 32
 ENEMY_EVENT_TYPE = 1
 
 
-class Laberint:
+class Food(pygame.sprite.Sprite):
+    def __init__(self, x, y, group1, group2):
+        super().__init__(group1, group2)
+        self.image = pygame.Surface((5, 5))
+        self.image.fill((250, 210, 1))
+        self.rect = pygame.Rect(x * TITLE_SIZE + TITLE_SIZE // 2 + 50, y * TITLE_SIZE + TITLE_SIZE // 2, 5, 5)
+        self.rect.x = x * TITLE_SIZE + TITLE_SIZE // 2 + 50
+        self.rect.y = y * TITLE_SIZE + TITLE_SIZE // 2
+
+
+class Labyrinth:
     def __init__(self, filename, free_tile, finish_tile):
         self.map = []
         with open(f"{MAPS_DIR}/{filename}") as input_file:
             for line in input_file:
                 self.map.append(list(map(int, line.split())))
-        self.heihgt = len(self.map)
-        self.wigth = len(self.map[0])
+        self.height = len(self.map)
+        self.width = len(self.map[0])
         self.tile_size = TITLE_SIZE
         self.free_tiles = free_tile
         self.finish = finish_tile
 
     def render(self, screen):
         colors = {0: (0, 0, 0), 1: (0, 0, 255), 2: (50, 50, 50)}
-        for y in range(self.heihgt):
-            for x in range(self.wigth):
-                rect = pygame.Rect(x * self.tile_size, y * self.tile_size, self.tile_size, self.tile_size)
+        for y in range(self.height):
+            for x in range(self.width):
+                rect = pygame.Rect(x * self.tile_size + 50, y * self.tile_size, self.tile_size, self.tile_size)
                 screen.fill(colors[self.get_tile_id((x, y))], rect)
 
     def get_tile_id(self, position):
@@ -36,15 +47,15 @@ class Laberint:
     def find_path_step(self, start, target):
         INF = 1000
         x, y = start
-        distance = [[INF] * self.wigth for _ in range(self.heihgt)]
+        distance = [[INF] * self.width for _ in range(self.height)]
         distance[y][x] = 0
-        prev = [[None] * self.wigth for _ in range(self.heihgt)]
+        prev = [[None] * self.width for _ in range(self.height)]
         queue = [(x, y)]
         while queue:
             x, y = queue.pop(0)
             for dx, dy in (1, 0), (0, 1), (-1, 0), (0, -1):
                 next_x, next_y = x + dx, y + dy
-                if 0 <= next_x < self.wigth and 0 <= next_y < self.heihgt and self.is_free((next_x, next_y)) and \
+                if 0 <= next_x < self.width and 0 <= next_y < self.height and self.is_free((next_x, next_y)) and \
                         distance[next_y][next_x] == INF:
                     distance[next_y][next_x] = distance[y][x] + 1
                     prev[next_y][next_x] = (x, y)
@@ -57,18 +68,25 @@ class Laberint:
         return x, y
 
 
-class Hero:
-    def __init__(self, position):
+class Hero(pygame.sprite.Sprite):
+    def __init__(self, position, group):
+        super().__init__(group)
         self.x, self.y = position
+        self.rect = pygame.Rect(self.x * TITLE_SIZE + TITLE_SIZE // 2 + 50, self.y * TITLE_SIZE + TITLE_SIZE // 2,
+                                TITLE_SIZE, TITLE_SIZE)
+        self.rect.x = self.x * TITLE_SIZE + TITLE_SIZE // 2 + 50
+        self.rect.y = self.y * TITLE_SIZE + TITLE_SIZE // 2
 
     def get_position(self):
         return self.x, self.y
 
     def set_position(self, position):
         self.x, self.y = position
+        self.rect.x = self.x * TITLE_SIZE + TITLE_SIZE // 2 + 50
+        self.rect.y = self.y * TITLE_SIZE + TITLE_SIZE // 2
 
     def render(self, screen):
-        center = self.x * TITLE_SIZE + TITLE_SIZE // 2, self.y * TITLE_SIZE + TITLE_SIZE // 2
+        center = self.x * TITLE_SIZE + TITLE_SIZE // 2 + 50, self.y * TITLE_SIZE + TITLE_SIZE // 2
         pygame.draw.circle(screen, (255, 255, 0), center, TITLE_SIZE / 2)
 
 
@@ -85,20 +103,22 @@ class Enemy:
         self.x, self.y = position
 
     def render(self, screen):
-        center = self.x * TITLE_SIZE + TITLE_SIZE // 2, self.y * TITLE_SIZE + TITLE_SIZE // 2
+        center = self.x * TITLE_SIZE + TITLE_SIZE // 2 + 50, self.y * TITLE_SIZE + TITLE_SIZE // 2
         pygame.draw.circle(screen, (255, 0, 0), center, TITLE_SIZE / 2)
 
 
 class Game:
-    def __init__(self, labirint, hero, enemy):
-        self.labirint = labirint
+    def __init__(self, labyrinth, hero, enemy1, enemy2):
+        self.labyrinth = labyrinth
+
         self.hero = hero
-        self.enemy = enemy
+        self.enemy1 = enemy1
+        self.enemy2 = enemy2
 
     def render(self, screen):
-        self.labirint.render(screen)
         self.hero.render(screen)
-        self.enemy.render(screen)
+        self.enemy1.render(screen)
+        self.enemy2.render(screen)
 
     def update_hero(self):
         next_x, next_y = self.hero.get_position()
@@ -110,18 +130,21 @@ class Game:
             next_y -= 1
         if pygame.key.get_pressed()[pygame.K_DOWN]:
             next_y += 1
-        if self.labirint.is_free((next_x, next_y)):
+        if self.labyrinth.is_free((next_x, next_y)):
             self.hero.set_position((next_x, next_y))
 
     def move_enemy(self):
-        next_position = self.labirint.find_path_step(self.enemy.get_position(), self.hero.get_position())
-        self.enemy.set_position(next_position)
+        next_position1 = self.labyrinth.find_path_step(self.enemy1.get_position(), self.hero.get_position())
+        next_position2 = self.labyrinth.find_path_step(self.enemy2.get_position(), self.hero.get_position())
+
+        self.enemy1.set_position(next_position1)
+        self.enemy2.set_position(next_position2)
 
     def check_win(self):
-        return self.labirint.get_tile_id(self.hero.get_position()) == 2
+        return self.labyrinth.get_tile_id(self.hero.get_position()) == 2
 
-    def check_los(self):
-        return self.hero.get_position() == self.enemy.get_position()
+    def check_los(self, enemy):
+        return self.hero.get_position() == enemy.get_position()
 
 
 def show_message(screen, message):
@@ -139,10 +162,19 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode(size)
 
-    labirint = Laberint("simple_map2.txt", [0, 2], 2)
-    hero = Hero((7, 7))
-    enemy = Enemy((7, 1))
-    game = Game(labirint, hero, enemy)
+    all_sprites = pygame.sprite.Group()
+    food_sprites = pygame.sprite.Group()
+
+    points_food = [(1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1), (7, 1), (8, 1), (9, 1), (10, 1), (11, 1),
+                   (1, 2), (1, 3), (1, 4)]
+    for i in points_food:
+        Food(i[0], i[1], all_sprites, food_sprites)
+
+    labyrinth = Labyrinth("simple_map2.txt", [0, 2], 2)
+    hero = Hero((19, 17), all_sprites)
+    enemy1 = Enemy((7, 1))
+    enemy2 = Enemy((12, 12))
+    game = Game(labyrinth, hero, enemy1, enemy2)
 
     clock = pygame.time.Clock()
     running = True
@@ -155,12 +187,15 @@ def main():
                 game.move_enemy()
         if not game_over:
             game.update_hero()
+        pygame.sprite.spritecollide(hero, food_sprites, True)
         screen.fill((0, 0, 0))
+        labyrinth.render(screen)
+        food_sprites.draw(screen)
         game.render(screen)
         if game.check_win():
             game_over = True
             show_message(screen, 'You win')
-        if game.check_los():
+        if game.check_los(enemy1) or game.check_los(enemy2):
             game_over = True
             show_message(screen, 'You lose')
         pygame.display.flip()
