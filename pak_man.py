@@ -4,6 +4,7 @@ from load_image import load_image
 size = width, height = 900, 800
 FPS = 10
 
+points = []
 MAPS_DIR = "maps"
 TITLE_SIZE = 32
 ENEMY_EVENT_TYPE = 1
@@ -36,7 +37,16 @@ class Labyrinth:
         for y in range(self.height):
             for x in range(self.width):
                 rect = pygame.Rect(x * self.tile_size + 50, y * self.tile_size, self.tile_size, self.tile_size)
+                if self.get_tile_id((x, y)) == 0:
+                    points.append((x, y))
                 screen.fill(colors[self.get_tile_id((x, y))], rect)
+
+    def point(self):
+        for y in range(self.height):
+            for x in range(self.width):
+                if self.get_tile_id((x, y)) == 0:
+                    points.append((x, y))
+        return points
 
     def get_tile_id(self, position):
         return self.map[position[1]][position[0]]
@@ -165,16 +175,16 @@ def main():
     all_sprites = pygame.sprite.Group()
     food_sprites = pygame.sprite.Group()
 
-    points_food = [(1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1), (7, 1), (8, 1), (9, 1), (10, 1), (11, 1),
-                   (1, 2), (1, 3), (1, 4)]
-    for i in points_food:
-        Food(i[0], i[1], all_sprites, food_sprites)
-
     labyrinth = Labyrinth("simple_map2.txt", [0, 2], 2)
     hero = Hero((19, 17), all_sprites)
     enemy1 = Enemy((7, 1))
     enemy2 = Enemy((12, 12))
     game = Game(labyrinth, hero, enemy1, enemy2)
+
+    points_food = Labyrinth.point(Labyrinth)
+
+    for i in points_food:
+        Food(i[0], i[1], all_sprites, food_sprites)
 
     clock = pygame.time.Clock()
     running = True
