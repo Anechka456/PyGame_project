@@ -37,8 +37,6 @@ class Labyrinth:
         for y in range(self.height):
             for x in range(self.width):
                 rect = pygame.Rect(x * self.tile_size + 50, y * self.tile_size, self.tile_size, self.tile_size)
-                if self.get_tile_id((x, y)) == 0:
-                    points.append((x, y))
                 screen.fill(colors[self.get_tile_id((x, y))], rect)
 
     def point(self):
@@ -181,7 +179,7 @@ def main():
     enemy2 = Enemy((12, 12))
     game = Game(labyrinth, hero, enemy1, enemy2)
 
-    points_food = Labyrinth.point(Labyrinth)
+    points_food = labyrinth.point()
 
     for i in points_food:
         Food(i[0], i[1], all_sprites, food_sprites)
