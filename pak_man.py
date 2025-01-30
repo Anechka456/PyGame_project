@@ -1,5 +1,6 @@
 import pygame
 from load_image import load_image
+from final_window import FinalWindowPacMan
 
 size = width, height = 900, 800
 FPS = 10
@@ -37,6 +38,8 @@ class Labyrinth:
         for y in range(self.height):
             for x in range(self.width):
                 rect = pygame.Rect(x * self.tile_size + 50, y * self.tile_size, self.tile_size, self.tile_size)
+                if self.get_tile_id((x, y)) == 0:
+                    points.append((x, y))
                 screen.fill(colors[self.get_tile_id((x, y))], rect)
 
     def point(self):
@@ -148,9 +151,6 @@ class Game:
         self.enemy1.set_position(next_position1)
         self.enemy2.set_position(next_position2)
 
-    def check_win(self):
-        return self.labyrinth.get_tile_id(self.hero.get_position()) == 2
-
     def check_los(self, enemy):
         return self.hero.get_position() == enemy.get_position()
 
@@ -166,7 +166,7 @@ def show_message(screen, message):
     screen.blit(text, (text_x, text_y))
 
 
-def main():
+def play():
     pygame.init()
     screen = pygame.display.set_mode(size)
 
@@ -184,6 +184,10 @@ def main():
     for i in points_food:
         Food(i[0], i[1], all_sprites, food_sprites)
 
+    print(len(points_food))
+
+    score = 0
+
     clock = pygame.time.Clock()
     running = True
     game_over = False
@@ -195,21 +199,20 @@ def main():
                 game.move_enemy()
         if not game_over:
             game.update_hero()
-        pygame.sprite.spritecollide(hero, food_sprites, True)
+        score += len(pygame.sprite.spritecollide(hero, food_sprites, True))
         screen.fill((0, 0, 0))
         labyrinth.render(screen)
         food_sprites.draw(screen)
         game.render(screen)
-        if game.check_win():
+        if score == 300:
             game_over = True
-            show_message(screen, 'You win')
+            FinalWindowPacMan('Вы выйграли!', score)
         if game.check_los(enemy1) or game.check_los(enemy2):
             game_over = True
-            show_message(screen, 'You lose')
+            FinalWindowPacMan('К сожалению вы проиграли!', score)
         pygame.display.flip()
         clock.tick(FPS)
     pygame.quit()
 
 
-if __name__ == '__main__':
-    main()
+play()
