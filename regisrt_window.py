@@ -36,6 +36,7 @@ color1 = GRAY
 color2 = GRAY
 color3 = GRAY
 
+
 def proverka(password, name):
     try:
         password = ''.join(password.split())
@@ -45,7 +46,7 @@ def proverka(password, name):
             Error('Ведите Name')
         elif password == '':
             Error('Ведите password')
-        elif len(password) < 9:
+        elif len(password) < 4:
             raise ValueError
         elif password.isdigit():
             raise ValueError
@@ -70,16 +71,20 @@ def proverka(password, name):
                 flag_lower = True
         if flag_lower and flag_upper and flag_number:
             return True
-        raise ValueError
     except Exception:
         Error('Неверный пороль')
 
 
 def Error(text):
-    print(text) #Создвние менюшки ошибки
+    print(text)  # Создвние менюшки ошибки
+
+
 def Login(active1, active2):
     if proverka(password, username):
         print('занесение в б д')
+
+
+
 # Основной игровой цикл
 while True:
     for event in pygame.event.get():
@@ -104,7 +109,6 @@ while True:
                 active3 = not active3
             else:
                 active3 = False
-                Login(active1, active2)
 
             # Изменяем цвет поля ввода
             color1 = (255, 0, 0) if active1 else GRAY
@@ -118,7 +122,8 @@ while True:
                 elif event.key == pygame.K_BACKSPACE:
                     username = username[:-1]
                 else:
-                    username += event.unicode
+                    if len(username) < 14:
+                        username += event.unicode
 
             if active2:
                 if event.key == pygame.K_RETURN:
@@ -126,7 +131,8 @@ while True:
                 elif event.key == pygame.K_BACKSPACE:
                     password = password[:-1]
                 else:
-                    password += event.unicode
+                    if len(password) < 14:
+                        password += event.unicode
 
     screen.fill(WHITE)
 
@@ -138,7 +144,7 @@ while True:
     # Отображаем текст
     txt_surface1 = font.render(username, True, BLACK)
     txt_surface2 = font.render(password, True, BLACK)
-    '''txt_surface2 = font.render('*' * len(password), True, BLACK)  # Скрываем пароль'''
+    '''txt_surface2 = font.render('*' * len(password), True, BLACK)  # Скрывание пароля'''
     screen.blit(txt_surface1, (input_box1.x + 5, input_box1.y + 5))
     screen.blit(txt_surface2, (input_box2.x + 5, input_box2.y + 5))
 
