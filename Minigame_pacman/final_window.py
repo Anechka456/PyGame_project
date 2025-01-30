@@ -3,13 +3,14 @@ import sys
 import pygame
 
 import map
+import pak_man
 
 
 class FinalWindowPacMan:
     def __init__(self, text, score):
         pygame.init()
         pygame.mixer.init()
-        # self.sound_click = pygame.mixer.Sound('data/images/click.mp3')
+        self.sound_click = pygame.mixer.Sound('data/images/click.mp3')
 
         width, height = 900, 800
         self.screen = pygame.display.set_mode((width, height))
@@ -71,8 +72,8 @@ class FinalWindowPacMan:
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.try_again_button.collidepoint(event.pos):
-                        # self.sound_click.play()
-                        # play()
+                        self.sound_click.play()
+                        pak_man.play()
                         self.running = False
                     elif self.exit_button.collidepoint(event.pos):
                         # self.sound_click.play()

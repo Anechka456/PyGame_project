@@ -6,7 +6,7 @@ size = width, height = 900, 800
 FPS = 10
 
 points = []
-MAPS_DIR = "maps"
+MAPS_DIR = "../data/maps"
 TITLE_SIZE = 32
 ENEMY_EVENT_TYPE = 1
 
