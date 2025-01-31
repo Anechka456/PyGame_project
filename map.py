@@ -6,6 +6,7 @@ from Minigame_memory.lvl_memory import play_memory
 from Minigame_minisweeper.lvl_minisweeper import play_sweeper
 from Minigame_snake.snake import play_snake
 from Minigame_space.space import play_space
+from Minigame_pacman.pak_man import play_pacman
 from load_image import load_image
 
 pygame.mixer.init()
@@ -24,6 +25,11 @@ tile_width = tile_height = 50
 def window_snake():
     cleaning_sprites()
     play_snake()
+
+
+def window_pacman():
+    cleaning_sprites()
+    play_pacman()
 
 
 def window_sweeper():
@@ -313,6 +319,11 @@ class Map:
             elif pygame.sprite.collide_mask(player, self.snake):
                 Player.sound_walking.stop()
                 window_snake()
+                terminate()
+
+            elif pygame.sprite.collide_mask(player, self.pac_man):
+                Player.sound_walking.stop()
+                window_pacman()
                 terminate()
 
             elif pygame.sprite.collide_mask(player, self.sweeper):

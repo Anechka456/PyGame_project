@@ -1,12 +1,12 @@
 import pygame
 from load_image import load_image
-from final_window import FinalWindowPacMan
+from Minigame_pacman.final_window import FinalWindowPacMan
 
 size = width, height = 900, 800
 FPS = 10
 
 points = []
-MAPS_DIR = "../data/maps"
+MAPS_DIR = "data/maps"
 TITLE_SIZE = 32
 ENEMY_EVENT_TYPE = 1
 
@@ -166,7 +166,7 @@ def show_message(screen, message):
     screen.blit(text, (text_x, text_y))
 
 
-def play():
+def play_pacman():
     pygame.init()
     screen = pygame.display.set_mode(size)
 
@@ -183,8 +183,6 @@ def play():
 
     for i in points_food:
         Food(i[0], i[1], all_sprites, food_sprites)
-
-    print(len(points_food))
 
     score = 0
 
@@ -204,7 +202,7 @@ def play():
         labyrinth.render(screen)
         food_sprites.draw(screen)
         game.render(screen)
-        if score == 300:
+        if score == 260:
             game_over = True
             FinalWindowPacMan('Вы выйграли!', score)
         if game.check_los(enemy1) or game.check_los(enemy2):
@@ -213,6 +211,3 @@ def play():
         pygame.display.flip()
         clock.tick(FPS)
     pygame.quit()
-
-
-play()
