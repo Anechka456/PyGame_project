@@ -1,6 +1,11 @@
 import pygame
 import sys
 
+from requests import get, post, delete
+from werkzeug.security import generate_password_hash, check_password_hash
+
+server = 'https://pygameproect.pythonanywhere.com'
+
 # Инициализация Pygame
 pygame.init()
 
@@ -26,26 +31,41 @@ font = pygame.font.Font(None, 36)
 # Переменные для хранения вводимых данных
 username = ''
 password = ''
-input_box1 = pygame.Rect(WIDTH / 2 - 100, 100, 200, 40)
-input_box2 = pygame.Rect(WIDTH / 2 - 100, 170, 200, 40)
-login = pygame.Rect(50, 50, 50, 50)
+email = ''
+name = pygame.Rect(WIDTH / 2 - 100, 380, 200, 40)
+passwors_registr = pygame.Rect(WIDTH / 2 - 100, 450, 200, 40)
+email_registr = pygame.Rect(WIDTH / 2 - 100, 520, 200, 40)
+registr = pygame.Rect(WIDTH / 2, 320, 100, 36)
+login = pygame.Rect(WIDTH / 2 - 100, 320, 100, 36)
 active1 = False
 active2 = False
 active3 = False
+active4 = False
+active5 = False
 color1 = GRAY
 color2 = GRAY
 color3 = GRAY
+color4 = GRAY
+color5 = GRAY
 
 
-def proverka(password, name):
+def proverka(password, name, email):
     try:
         password = ''.join(password.split())
-        if name == '' and password == '':
-            Error('Ведите Name and password')
+        if name == '' and password == '' and email == '':
+            Error('Ведите name and password and email')
+        elif name == '' and password == '':
+            Error('Ведите name and password')
+        elif password == '' and email == '':
+            Error('Ведите password and email')
+        elif name == '' and email == '':
+            Error('Ведите name and email')
         elif name == '':
             Error('Ведите Name')
         elif password == '':
             Error('Ведите password')
+        elif email == '':
+            Error('Ведите email')
         elif len(password) < 4:
             raise ValueError
         elif password.isdigit():
@@ -80,9 +100,31 @@ def Error(text):
 
 
 def Login(active1, active2):
-    if proverka(password, username):
+    if proverka(password, username, email):
         print('занесение в б д')
 
+
+# три фунции для проверки user
+def check_email(email):
+    """функция запрашиваем всех пользователей на сервере и проверяет если такой email"""
+    return True if email in [i['email'] for i in get(f'{server}/api/users').json()['users']] else False
+
+
+def check_name(name):
+    """функция запрашиваем всех пользователей на сервере и проверяет если такое имя"""
+    return True if name in [i['name'] for i in get(f'{server}/api/users').json()['users']] else False
+
+
+def check_password(name, email, password):
+    """функция запрашивает пользователя на сервер и проверяет пароль"""
+    data = get(f'{server}/user_name?user={name}').json()
+    return True if data['users']['email'] == email and check_password_hash(data['users']['hashed_password'],
+                                                                           password) else False
+
+
+def upload_to_server(name, password, email):
+    if check_email(email) and check_name(name) and check_password(name, email, password):
+        print('Ура ты зашел!!!!')
 
 
 # Основной игровой цикл
@@ -94,26 +136,39 @@ while True:
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             # Если пользователь нажал на поле ввода, активируем его
-            if input_box1.collidepoint(event.pos):
+            if name.collidepoint(event.pos):
                 active1 = not active1
             else:
                 active1 = False
 
-            if input_box2.collidepoint(event.pos):
+            if passwors_registr.collidepoint(event.pos):
                 active2 = not active2
             else:
                 active2 = False
 
-            if login.collidepoint(event.pos):
+            if registr.collidepoint(event.pos):
                 Login(active1, active2)
                 active3 = not active3
             else:
                 active3 = False
 
+            if login.collidepoint(event.pos):
+                upload_to_server(username, password, email)
+                active4 = not active3
+            else:
+                active4 = False
+
+            if email_registr.collidepoint(event.pos):
+                active5 = not active5
+            else:
+                active5 = False
+
             # Изменяем цвет поля ввода
             color1 = (255, 0, 0) if active1 else GRAY
             color2 = (255, 0, 0) if active2 else GRAY
             color3 = (255, 0, 0) if active3 else GRAY
+            color4 = (255, 0, 0) if active4 else GRAY
+            color5 = (255, 0, 0) if active5 else GRAY
 
         if event.type == pygame.KEYDOWN:
             if active1:
@@ -134,18 +189,30 @@ while True:
                     if len(password) < 14:
                         password += event.unicode
 
+            if active5:
+                if event.key == pygame.K_RETURN:
+                    upload_to_server(name, password, email)
+                elif event.key == pygame.K_BACKSPACE:
+                    email = email[:-1]
+                else:
+                    email += event.unicode
+
     screen.fill(WHITE)
 
     # Отрисовка полей ввода
-    pygame.draw.rect(screen, color1, input_box1, 2)
-    pygame.draw.rect(screen, color2, input_box2, 2)
-    pygame.draw.rect(screen, color3, login, 2)
+    pygame.draw.rect(screen, color1, name, 2)
+    pygame.draw.rect(screen, color2, passwors_registr, 2)
+    pygame.draw.rect(screen, color3, registr, 2)
+    pygame.draw.rect(screen, color4, login, 2)
+    pygame.draw.rect(screen, color5, email_registr, 2)
 
     # Отображаем текст
     txt_surface1 = font.render(username, True, BLACK)
     txt_surface2 = font.render(password, True, BLACK)
+    txt_surface3 = font.render(email, True, BLACK)
     '''txt_surface2 = font.render('*' * len(password), True, BLACK)  # Скрывание пароля'''
-    screen.blit(txt_surface1, (input_box1.x + 5, input_box1.y + 5))
-    screen.blit(txt_surface2, (input_box2.x + 5, input_box2.y + 5))
+    screen.blit(txt_surface1, (name.x + 5, name.y + 5))
+    screen.blit(txt_surface2, (passwors_registr.x + 5, passwors_registr.y + 5))
+    screen.blit(txt_surface3, (email_registr.x + 5, email_registr.y + 5))
 
     pygame.display.flip()
