@@ -125,6 +125,8 @@ def check_password(name, email, password):
 def upload_to_server(name, password, email):
     if check_email(email) and check_name(name) and check_password(name, email, password):
         print('Ура ты зашел!!!!')
+    else:
+        print('не')
 
 
 # Основной игровой цикл
@@ -195,7 +197,8 @@ while True:
                 elif event.key == pygame.K_BACKSPACE:
                     email = email[:-1]
                 else:
-                    email += event.unicode
+                    if len(email) < 14:
+                        email += event.unicode
 
     screen.fill(WHITE)
 
