@@ -99,11 +99,6 @@ def Error(text):
     print(text)  # Создвние менюшки ошибки
 
 
-def Login(active1, active2):
-    if proverka(password, username, email):
-        print('занесение в б д')
-
-
 # три фунции для проверки user
 def check_email(email):
     """функция запрашиваем всех пользователей на сервере и проверяет если такой email"""
@@ -129,6 +124,15 @@ def upload_to_server(name, password, email):
         print('не')
 
 
+def add_user(name, email, password):
+    if proverka(password, username, email):
+        """функция добавляет пользователя на сервер"""
+        if not check_name(name) and not check_email(email):
+            return post(f'{server}/api/users', json={
+                'name': name, 'email': email, 'hashed_password': password}).json()
+        return False  # возвращает False если такое имя или email же есть
+
+
 # Основной игровой цикл
 while True:
     for event in pygame.event.get():
@@ -149,7 +153,7 @@ while True:
                 active2 = False
 
             if registr.collidepoint(event.pos):
-                Login(active1, active2)
+                add_user(name, email, password)
                 active3 = not active3
             else:
                 active3 = False
@@ -174,18 +178,14 @@ while True:
 
         if event.type == pygame.KEYDOWN:
             if active1:
-                if event.key == pygame.K_RETURN:
-                    Login(active1, active2)
-                elif event.key == pygame.K_BACKSPACE:
+                if event.key == pygame.K_BACKSPACE:
                     username = username[:-1]
                 else:
                     if len(username) < 14:
                         username += event.unicode
 
             if active2:
-                if event.key == pygame.K_RETURN:
-                    Login(active1, active2)
-                elif event.key == pygame.K_BACKSPACE:
+                if event.key == pygame.K_BACKSPACE:
                     password = password[:-1]
                 else:
                     if len(password) < 14:
@@ -193,7 +193,7 @@ while True:
 
             if active5:
                 if event.key == pygame.K_RETURN:
-                    upload_to_server(name, password, email)
+                    upload_to_server(username, password, email)
                 elif event.key == pygame.K_BACKSPACE:
                     email = email[:-1]
                 else:
