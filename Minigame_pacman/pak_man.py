@@ -172,8 +172,10 @@ class Hero(pygame.sprite.Sprite):
         self.rect.y = self.y * TITLE_SIZE + TITLE_SIZE // 2
 
     def render(self, screen):
-        center = self.x * TITLE_SIZE + TITLE_SIZE // 2 + 50, self.y * TITLE_SIZE + TITLE_SIZE // 2
-        pygame.draw.circle(screen, (255, 255, 0), center, TITLE_SIZE / 2)
+        pakmen = pygame.image.load("data\data_pacman\pacmen.png")
+        pakmen = pygame.transform.scale(pakmen, (30, 30))
+        center = self.x * TITLE_SIZE + TITLE_SIZE // 2 + 32, self.y * TITLE_SIZE + TITLE_SIZE // 2 - 15
+        screen.blit(pakmen, center)
 
 
 class Enemy:
@@ -189,8 +191,10 @@ class Enemy:
         self.x, self.y = position
 
     def render(self, screen):
-        center = self.x * TITLE_SIZE + TITLE_SIZE // 2 + 50, self.y * TITLE_SIZE + TITLE_SIZE // 2
-        pygame.draw.circle(screen, (255, 0, 0), center, TITLE_SIZE / 2)
+        blue_ghost = pygame.image.load("data\data_pacman\dlue_ghost.png")
+        blue_ghost = pygame.transform.scale(blue_ghost, (30, 30))
+        center = self.x * TITLE_SIZE + TITLE_SIZE // 2 + 33, self.y * TITLE_SIZE + TITLE_SIZE // 2 - 15
+        screen.blit(blue_ghost, center)
 
 
 class Game:
