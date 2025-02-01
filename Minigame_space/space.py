@@ -24,6 +24,7 @@ def check_win():
 
 def game_over():
     cleaning_sprites()
+    sound_background.stop()
     final_window.FinalWindowSpace('К сожалению вы проиграли!')
 
 
