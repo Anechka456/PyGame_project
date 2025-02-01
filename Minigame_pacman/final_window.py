@@ -2,8 +2,8 @@ import sys
 
 import pygame
 
+import Minigame_pacman.pak_man
 import map
-from Minigame_pacman import pak_man
 
 
 class FinalWindowPacMan:
@@ -73,12 +73,12 @@ class FinalWindowPacMan:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.try_again_button.collidepoint(event.pos):
                         self.sound_click.play()
-                        pak_man.play_pacman()
+                        Minigame_pacman.pak_man.pacman()
                         self.running = False
                     elif self.exit_button.collidepoint(event.pos):
                         self.sound_click.play()
-                        map.Map(360, 800)
                         self.running = False
+                        map.Map(360, 800)
 
             self.screen.fill(self.background_color)
             self.draw_title()

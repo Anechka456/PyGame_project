@@ -20,6 +20,7 @@ class MemoryCard:
         self.size = size
 
     def get_click(self):
+        """функция открывает карточку"""
         global IMAGE, LAST_OPEN, MOVES
         if not self.open:
             if IMAGE is None:
@@ -57,6 +58,7 @@ def memory(screen, n):
     size = int(size2 * 0.8)
 
     pygame.mixer.init()
+    # звуки
     sound_card = pygame.mixer.Sound('data/images_memory/cards.mp3')
     sound_click = pygame.mixer.Sound('data/images/click.mp3')
 
@@ -82,6 +84,7 @@ def memory(screen, n):
             if event.type == pygame.QUIT:
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN and pygame.time.get_ticks() - LAST_OPEN >= 600:
+                # отслеживание нажатия на карточку
                 mx, my = event.pos
                 mx, my = mx - 110, my - 110
                 x, y = mx // size2, my // size2
@@ -109,8 +112,10 @@ def memory(screen, n):
         clock.tick(60)
 
         if MOVES < 0:
+            # действия если попытки закончились
             running = False
             FinalWindowMemory(n, 'К сожалению вы проиграли!')
         elif all(map(lambda x: all(map(lambda y: y.open, x)), board)):
+            # действия если все карточки открыты
             running = False
             FinalWindowMemory(n, 'Вы выйграли!')
