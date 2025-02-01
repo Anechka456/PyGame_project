@@ -42,7 +42,7 @@ class StartWindow:
 
         pygame.display.flip()
 
-    def run(self):
+    def run(self): # Нажатие
         running = True
         while running:
             for event in pygame.event.get():

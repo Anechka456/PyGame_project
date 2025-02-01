@@ -1,17 +1,92 @@
+import random
+import sys
+
 import pygame
-from load_image import load_image
+
 from Minigame_pacman.final_window import FinalWindowPacMan
+from load_image import load_image
+
+
+def terminate():
+    pygame.quit()
+    sys.exit()
+
+
+def start_screen(screen):
+    intro_text = ["Андриян Николаев учился в Шоршелской семилетней школе.",
+                  "Его первой учительницей была Клавдия Ивановна Семёнова,",
+                  "которая прививала ученику любовь",
+                  "к чувашской и русской культуре,",
+                  "языку и литературе родного и русского народа.",
+                  "По воспоминаниям учительницы, Клавдия Ивановна",
+                  "поощряла коллективизм и взаимовыручку ребят.",
+                  "Например, если кто-то по рассеянности",
+                  "забывал дома ручку, она не давала свою,",
+                  "а обращалась к классу:",
+                  "«Кто поможет, ребята?».",
+                  "И малыши выручали товарища,",
+                  "одним из первых всегда",
+                  " поднимал руку Андриян."
+                  ]
+
+    # Создание списка звезд
+    stars = []
+    for _ in range(200):
+        x = random.randint(0, 900)
+        y = random.randint(0, 800)
+        stars.append((x, y, random.randint(1, 3)))  # (x, y, размер)
+
+    def draw_stars():
+        """Функция рисует звезды"""
+        for star in stars:
+            x, y, size = star
+            # Случайное мерцание звезд
+            brightness = random.randint(100, 255)
+            pygame.draw.circle(screen, (brightness, brightness, brightness), (x, y), size)
+
+    def draw_text():
+        """Функция рисует текст"""
+        font = pygame.font.SysFont('impact', 30)
+        text_coord = 20
+        for line in intro_text:
+            string_rendered = font.render(line, 1, (102, 0, 255))
+            intro_rect = string_rendered.get_rect()
+            text_coord += 10
+            intro_rect.top = text_coord
+            intro_rect.x = 10
+            text_coord += intro_rect.height
+            screen.blit(string_rendered, intro_rect)
+
+    def draw_images():
+        """Функция вставляет картинку"""
+        images = pygame.transform.scale(load_image('data_pacman/Ilempi.png'), (400, 500))
+        screen.blit(images, (550, 300))
+
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.KEYDOWN or \
+                    event.type == pygame.MOUSEBUTTONDOWN:
+                return  # начинаем игру
+        screen.fill((0, 0, 0))
+        draw_stars()
+        draw_text()
+        draw_images()
+        pygame.display.flip()
+        pygame.time.delay(100)  # Задержка для изменения "мерцания"
+
 
 size = width, height = 900, 800
 FPS = 10
-
 points = []
 MAPS_DIR = "data/maps"
 TITLE_SIZE = 32
 ENEMY_EVENT_TYPE = 1
 
 
-class Food(pygame.sprite.Sprite):
+class Food(pygame.sprite.Sprite): # Рисование точек
     def __init__(self, x, y, group1, group2):
         super().__init__(group1, group2)
         self.image = pygame.Surface((5, 5))
@@ -33,7 +108,7 @@ class Labyrinth:
         self.free_tiles = free_tile
         self.finish = finish_tile
 
-    def render(self, screen):
+    def render(self, screen): # Рисование карты
         colors = {0: (0, 0, 0), 1: (0, 0, 255), 2: (50, 50, 50)}
         for y in range(self.height):
             for x in range(self.width):
@@ -42,14 +117,14 @@ class Labyrinth:
                     points.append((x, y))
                 screen.fill(colors[self.get_tile_id((x, y))], rect)
 
-    def point(self):
+    def point(self): # передача расположения точек
         for y in range(self.height):
             for x in range(self.width):
                 if self.get_tile_id((x, y)) == 0:
                     points.append((x, y))
         return points
 
-    def get_tile_id(self, position):
+    def get_tile_id(self, position): # узнавание color
         return self.map[position[1]][position[0]]
 
     def is_free(self, position):
@@ -107,13 +182,13 @@ class Enemy:
         self.delay = 200
         pygame.time.set_timer(ENEMY_EVENT_TYPE, self.delay)
 
-    def get_position(self):
+    def get_position(self): # позиция призрака
         return self.x, self.y
 
-    def set_position(self, position):
+    def set_position(self, position): # новая позиция призрака
         self.x, self.y = position
 
-    def render(self, screen):
+    def render(self, screen): # Движение призрака
         center = self.x * TITLE_SIZE + TITLE_SIZE // 2 + 50, self.y * TITLE_SIZE + TITLE_SIZE // 2
         pygame.draw.circle(screen, (255, 0, 0), center, TITLE_SIZE / 2)
 
@@ -131,7 +206,7 @@ class Game:
         self.enemy1.render(screen)
         self.enemy2.render(screen)
 
-    def update_hero(self):
+    def update_hero(self): # новое расположение пакмена
         next_x, next_y = self.hero.get_position()
         if pygame.key.get_pressed()[pygame.K_LEFT]:
             next_x -= 1
@@ -151,11 +226,11 @@ class Game:
         self.enemy1.set_position(next_position1)
         self.enemy2.set_position(next_position2)
 
-    def check_los(self, enemy):
+    def check_los(self, enemy): # проверка на проигрыш
         return self.hero.get_position() == enemy.get_position()
 
 
-def show_message(screen, message):
+def show_message(screen, message): # создания окна
     font = pygame.font.Font(None, 50)
     text = font.render(message, 1, (50, 70, 0))
     text_x = width // 2 - text.get_width() // 2
@@ -166,20 +241,28 @@ def show_message(screen, message):
     screen.blit(text, (text_x, text_y))
 
 
-def play_pacman():
+def pacman():
     pygame.init()
+    pygame.mixer.init()
+    sound_start_game = pygame.mixer.Sound('data/data_pacman/start_game.mp3')
+    sound_lose = pygame.mixer.Sound('data/data_pacman/lose.mp3')
+    sound_win = pygame.mixer.Sound('data/data_pacman/win.mp3')
+    sound_food = pygame.mixer.Sound('data/data_pacman/food.mp3')
+    sound_food.play(-1)
+    sound_food.set_volume(0)
+
     screen = pygame.display.set_mode(size)
 
     all_sprites = pygame.sprite.Group()
     food_sprites = pygame.sprite.Group()
 
-    labyrinth = Labyrinth("simple_map2.txt", [0, 2], 2)
+    labyrinth = Labyrinth("simple_map2.txt", [0, 2], 2) # Передеча для создания карты
     hero = Hero((19, 17), all_sprites)
     enemy1 = Enemy((7, 1))
     enemy2 = Enemy((12, 12))
     game = Game(labyrinth, hero, enemy1, enemy2)
 
-    points_food = labyrinth.point()
+    points_food = labyrinth.point() # список с точками
 
     for i in points_food:
         Food(i[0], i[1], all_sprites, food_sprites)
@@ -189,25 +272,50 @@ def play_pacman():
     clock = pygame.time.Clock()
     running = True
     game_over = False
+    sound_start_game.play()
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                terminate()
             if event.type == ENEMY_EVENT_TYPE and not game_over:
                 game.move_enemy()
         if not game_over:
             game.update_hero()
-        score += len(pygame.sprite.spritecollide(hero, food_sprites, True))
+        # количество точек с которыми произошла коллизия
+        collide_points = len(pygame.sprite.spritecollide(hero, food_sprites, True))
+        sound_food.set_volume(1) if collide_points else sound_food.set_volume(0)
+        score += collide_points
+
         screen.fill((0, 0, 0))
         labyrinth.render(screen)
         food_sprites.draw(screen)
         game.render(screen)
-        if score == 260:
+        if score >= 278:
+            sound_food.stop()
+            sound_win.play()
             game_over = True
+            running = False
+            points.clear()
             FinalWindowPacMan('Вы выйграли!', score)
         if game.check_los(enemy1) or game.check_los(enemy2):
+            sound_food.stop()
+            sound_lose.play()
             game_over = True
+            running = False
+            points.clear()
             FinalWindowPacMan('К сожалению вы проиграли!', score)
         pygame.display.flip()
         clock.tick(FPS)
     pygame.quit()
+
+def play_pacman():
+    pygame.init()
+    running = True
+    screen = pygame.display.set_mode(size)
+    start_screen(screen)
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+        pacman()
+        pygame.display.flip()
