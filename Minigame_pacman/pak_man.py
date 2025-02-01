@@ -173,10 +173,10 @@ class Hero(pygame.sprite.Sprite):
         self.rect.y = self.y * TITLE_SIZE + TITLE_SIZE // 2
 
     def render(self, screen):
-        pakman = pygame.image.load("data\data_pacman\pacman.png")
-        pakman = pygame.transform.scale(pakman, (30, 30))
+        pacman = pygame.image.load("data\data_pacman\pacman.png")
+        pacman = pygame.transform.scale(pacman, (30, 30))
         center = self.x * TITLE_SIZE + TITLE_SIZE // 2 + 32, self.y * TITLE_SIZE + TITLE_SIZE // 2 - 15
-        screen.blit(pakman, center)
+        screen.blit(pacman, center)
 
 
 class Enemy:
