@@ -84,6 +84,7 @@ points = []
 MAPS_DIR = "data/maps"
 TITLE_SIZE = 32
 ENEMY_EVENT_TYPE = 1
+AHGLE = 0 #Поворот спрайтов
 
 
 class Food(pygame.sprite.Sprite):
@@ -172,10 +173,10 @@ class Hero(pygame.sprite.Sprite):
         self.rect.y = self.y * TITLE_SIZE + TITLE_SIZE // 2
 
     def render(self, screen):
-        pakmen = pygame.image.load("data\data_pacman\pacmen.png")
-        pakmen = pygame.transform.scale(pakmen, (30, 30))
+        pakman = pygame.image.load("data\data_pacman\pacman.png")
+        pakman = pygame.transform.scale(pakman, (30, 30))
         center = self.x * TITLE_SIZE + TITLE_SIZE // 2 + 32, self.y * TITLE_SIZE + TITLE_SIZE // 2 - 15
-        screen.blit(pakmen, center)
+        screen.blit(pakman, center)
 
 
 class Enemy:
@@ -191,7 +192,7 @@ class Enemy:
         self.x, self.y = position
 
     def render(self, screen):
-        blue_ghost = pygame.image.load("data\data_pacman\dlue_ghost.png")
+        blue_ghost = pygame.image.load("data\data_pacman\ghost.png")
         blue_ghost = pygame.transform.scale(blue_ghost, (30, 30))
         center = self.x * TITLE_SIZE + TITLE_SIZE // 2 + 33, self.y * TITLE_SIZE + TITLE_SIZE // 2 - 15
         screen.blit(blue_ghost, center)
