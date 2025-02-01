@@ -156,6 +156,11 @@ class Labyrinth:
 
 
 class Hero(pygame.sprite.Sprite):
+    up_pacman = pygame.transform.scale(pygame.transform.rotate(load_image("data_pacman\pacman.png"), 90), (30, 30))
+    down_pacman = pygame.transform.scale(pygame.transform.rotate(load_image("data_pacman\pacman.png"), -90), (30, 30))
+    left_pacman = pygame.transform.scale(pygame.transform.rotate(load_image("data_pacman\pacman.png"), 180), (30, 30))
+    right_pacman = pygame.transform.scale(load_image("data_pacman\pacman.png"), (30, 30))
+
     def __init__(self, position, group):
         super().__init__(group)
         self.x, self.y = position
@@ -163,6 +168,7 @@ class Hero(pygame.sprite.Sprite):
                                 TITLE_SIZE, TITLE_SIZE)
         self.rect.x = self.x * TITLE_SIZE + TITLE_SIZE // 2 + 50
         self.rect.y = self.y * TITLE_SIZE + TITLE_SIZE // 2
+        self.image_pacman = pygame.transform.scale(load_image("data_pacman\pacman.png"), (30, 30))
 
     def get_position(self):
         return self.x, self.y
@@ -173,10 +179,8 @@ class Hero(pygame.sprite.Sprite):
         self.rect.y = self.y * TITLE_SIZE + TITLE_SIZE // 2
 
     def render(self, screen):
-        pacman = pygame.image.load("data\data_pacman\pacman.png")
-        pacman = pygame.transform.scale(pacman, (30, 30))
         center = self.x * TITLE_SIZE + TITLE_SIZE // 2 + 32, self.y * TITLE_SIZE + TITLE_SIZE // 2 - 15
-        screen.blit(pacman, center)
+        screen.blit(self.image_pacman, center)
 
 
 class Enemy:
@@ -192,7 +196,7 @@ class Enemy:
         self.x, self.y = position
 
     def render(self, screen):
-        blue_ghost = pygame.image.load("data\data_pacman\ghost.png")
+        blue_ghost = load_image("data_pacman\ghost.png")
         blue_ghost = pygame.transform.scale(blue_ghost, (30, 30))
         center = self.x * TITLE_SIZE + TITLE_SIZE // 2 + 33, self.y * TITLE_SIZE + TITLE_SIZE // 2 - 15
         screen.blit(blue_ghost, center)
@@ -215,12 +219,16 @@ class Game:
         next_x, next_y = self.hero.get_position()
         if pygame.key.get_pressed()[pygame.K_LEFT]:
             next_x -= 1
+            self.hero.image_pacman = Hero.left_pacman
         if pygame.key.get_pressed()[pygame.K_RIGHT]:
             next_x += 1
+            self.hero.image_pacman = Hero.right_pacman
         if pygame.key.get_pressed()[pygame.K_UP]:
             next_y -= 1
+            self.hero.image_pacman = Hero.up_pacman
         if pygame.key.get_pressed()[pygame.K_DOWN]:
             next_y += 1
+            self.hero.image_pacman = Hero.down_pacman
         if self.labyrinth.is_free((next_x, next_y)):
             self.hero.set_position((next_x, next_y))
 
