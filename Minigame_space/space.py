@@ -187,13 +187,15 @@ class Space:
 
         self.background = load_image('data_space/background.png')
 
+        # звуки
+        self.sound_bullet = pygame.mixer.Sound('data/data_space/laser.wav')
+        self.sound_explosion = pygame.mixer.Sound('data/data_space/explosion.wav')
+
         self.run()
 
     def run(self):
         pygame.init()
 
-        self.sound_bullet = pygame.mixer.Sound('data/data_space/laser.wav')
-        self.sound_explosion = pygame.mixer.Sound('data/data_space/explosion.wav')
         sound_background.play(-1)
 
         size = width, height = 900, 800
@@ -211,10 +213,12 @@ class Space:
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         self.sound_bullet.play()
+                        # генерируем заряд
                         Bullet((self.spaceship.rect.x, 480))
                     self.spaceship.update(event)
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     self.sound_bullet.play()
+                    # генерируем заряд
                     Bullet((self.spaceship.rect.x, 480))
 
             all_sprites.update()

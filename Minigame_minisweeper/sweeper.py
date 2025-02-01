@@ -221,6 +221,7 @@ class Play(Board, Sweeper):
 
         pygame.init()
         pygame.mixer.init()
+        # звуки
         self.sound_flag = pygame.mixer.Sound('data/images_sweeper/tick.mp3')
         self.sound_win = pygame.mixer.Sound('data/images_sweeper/win.mp3')
         self.sound_lose = pygame.mixer.Sound('data/images_sweeper/lose.mp3')
@@ -235,6 +236,7 @@ class Play(Board, Sweeper):
         self.screen2 = pygame.Surface((500, 600))
         pygame.display.set_caption('Game Minisweeper')
 
+        # rgb
         self.background_color = (99, 69, 48)
         self.text_color = (243, 179, 145)
         self.image_new_game = pygame.transform.scale(load_image(f"images_sweeper/emoji.jpg"),
@@ -255,11 +257,13 @@ class Play(Board, Sweeper):
         self.play()
 
     def placement(self):
+        """функция обнавляет состояние ячеек"""
         for y in range(self.y):
             for x in range(self.x):
                 self.board[y][x] = self.sweeper.pole[y][x]
 
     def double_tap_verification(self, coord):
+        """функция проверяет можно ли открыть ячейки если было двойное нажатие"""
         if self.sweeper.pole[coord[0]][coord[1]] == []:
             return False
         directions = [(0, -1), (-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1)]
@@ -335,6 +339,7 @@ class Play(Board, Sweeper):
         self.screen.blit(text_surface, (self.size[0] - 125, 25))
 
     def double_tap(self, coord):
+        """функция выполняет действия при двойном нажатии мыши"""
         if self.game_active:
             if self.double_tap_verification(coord):
                 directions = [(0, -1), (-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1)]
@@ -346,12 +351,15 @@ class Play(Board, Sweeper):
                     self.game_win()
 
     def clicking_left(self, coord):
+        """функция выполняет действия при нажатии левой кнопки мыши"""
         if self.game_active:
             if self.sweeper.hod:
+                # если этот ход первый генерируем поле
                 self.sweeper.creating_field((coord[0], coord[1]))
                 self.timer_started = True
                 self.start_ticks = pygame.time.get_ticks()  # Получаем текущее время в миллисекундах
             if self.sweeper.pole[coord[0]][coord[1]] != 'F':
+                # открываем ячейку если на ней нет флажка
                 self.sound_open_cell.play()
                 if self.sweeper.hidden_field[coord[0]][coord[1]] != '*':
                     self.sweeper.open_cell((coord[0], coord[1]))
@@ -362,12 +370,15 @@ class Play(Board, Sweeper):
                     self.game_win()
 
     def clicking_right(self, coord):
+        """функция выполняет действия при нажатии правой кнопки мыши"""
         if self.game_active:
             if (coord[0], coord[1]) in self.sweeper.points_flag:
+                # убираем флажок
                 self.sweeper.number_bomb += 1
                 del self.sweeper.points_flag[self.sweeper.points_flag.index((coord[0], coord[1]))]
                 self.sweeper.open_flag_cell((coord[0], coord[1]))
             else:
+                # ставим флажок
                 if self.sweeper.pole[coord[0]][coord[1]] == []:
                     self.sound_flag.play()
                     self.sweeper.number_bomb -= 1

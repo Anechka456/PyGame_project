@@ -259,7 +259,7 @@ class Map:
         self.x = x
         self.y = y
 
-        # интерактивные точки
+        # координаты интерактивных точек
         self.coord_interactive_points = [(60, 500), (1380, 0), (1300, 990), (60, 1530), (1200, 1900)]
 
         # точки деревьев
@@ -271,6 +271,7 @@ class Map:
         for i in coord_tree:
             Nature(i[0], i[1])
 
+        # спрайты мини игр чтобы отследить коллизию
         self.pac_man = MiniGamePacMan(interactive_points, self.coord_interactive_points[0])
         self.snake = MiniGameSnake(interactive_points, self.coord_interactive_points[1])
         self.sweeper = MiniGameSweeper(interactive_points, self.coord_interactive_points[2])
@@ -280,6 +281,7 @@ class Map:
         self.start()
 
     def generate_level(self, level):
+        """функция генерирует карту"""
         new_player, x, y = None, None, None
         for y in range(len(level)):
             for x in range(len(level[y])):
@@ -311,6 +313,7 @@ class Map:
                 elif event.type == pygame.KEYDOWN:
                     player.update(event)
 
+            # отслеживаем коллизию
             if pygame.sprite.collide_mask(player, self.memory):
                 Player.sound_walking.stop()
                 window_memory()

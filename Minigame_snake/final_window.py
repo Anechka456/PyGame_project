@@ -7,6 +7,7 @@ import map
 
 
 def finding_best_score():
+    """функция ищет лучший результат в бд"""
     con = sqlite3.connect("data/snake_score")
     cur = con.cursor()
     result = cur.execute("""SELECT max(score) FROM allScore""").fetchone()[0]
@@ -16,6 +17,7 @@ def finding_best_score():
 
 
 def adding_score(score):
+    """функция добавляет результат в бд"""
     con = sqlite3.connect("data/snake_score")
     cur = con.cursor()
     cur.execute(f"""INSERT INTO allScore(score) VALUES({score})""")
