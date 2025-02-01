@@ -86,7 +86,7 @@ TITLE_SIZE = 32
 ENEMY_EVENT_TYPE = 1
 
 
-class Food(pygame.sprite.Sprite): # Рисование точек
+class Food(pygame.sprite.Sprite):
     def __init__(self, x, y, group1, group2):
         super().__init__(group1, group2)
         self.image = pygame.Surface((5, 5))
@@ -108,7 +108,7 @@ class Labyrinth:
         self.free_tiles = free_tile
         self.finish = finish_tile
 
-    def render(self, screen): # Рисование карты
+    def render(self, screen):
         colors = {0: (0, 0, 0), 1: (0, 0, 255), 2: (50, 50, 50)}
         for y in range(self.height):
             for x in range(self.width):
@@ -117,14 +117,14 @@ class Labyrinth:
                     points.append((x, y))
                 screen.fill(colors[self.get_tile_id((x, y))], rect)
 
-    def point(self): # передача расположения точек
+    def point(self):
         for y in range(self.height):
             for x in range(self.width):
                 if self.get_tile_id((x, y)) == 0:
                     points.append((x, y))
         return points
 
-    def get_tile_id(self, position): # узнавание color
+    def get_tile_id(self, position):
         return self.map[position[1]][position[0]]
 
     def is_free(self, position):
@@ -182,13 +182,13 @@ class Enemy:
         self.delay = 200
         pygame.time.set_timer(ENEMY_EVENT_TYPE, self.delay)
 
-    def get_position(self): # позиция призрака
+    def get_position(self):
         return self.x, self.y
 
-    def set_position(self, position): # новая позиция призрака
+    def set_position(self, position):
         self.x, self.y = position
 
-    def render(self, screen): # Движение призрака
+    def render(self, screen):
         center = self.x * TITLE_SIZE + TITLE_SIZE // 2 + 50, self.y * TITLE_SIZE + TITLE_SIZE // 2
         pygame.draw.circle(screen, (255, 0, 0), center, TITLE_SIZE / 2)
 
@@ -206,7 +206,7 @@ class Game:
         self.enemy1.render(screen)
         self.enemy2.render(screen)
 
-    def update_hero(self): # новое расположение пакмена
+    def update_hero(self):
         next_x, next_y = self.hero.get_position()
         if pygame.key.get_pressed()[pygame.K_LEFT]:
             next_x -= 1
@@ -226,11 +226,11 @@ class Game:
         self.enemy1.set_position(next_position1)
         self.enemy2.set_position(next_position2)
 
-    def check_los(self, enemy): # проверка на проигрыш
+    def check_los(self, enemy):
         return self.hero.get_position() == enemy.get_position()
 
 
-def show_message(screen, message): # создания окна
+def show_message(screen, message):
     font = pygame.font.Font(None, 50)
     text = font.render(message, 1, (50, 70, 0))
     text_x = width // 2 - text.get_width() // 2
@@ -256,13 +256,13 @@ def pacman():
     all_sprites = pygame.sprite.Group()
     food_sprites = pygame.sprite.Group()
 
-    labyrinth = Labyrinth("simple_map2.txt", [0, 2], 2) # Передеча для создания карты
+    labyrinth = Labyrinth("simple_map2.txt", [0, 2], 2)
     hero = Hero((19, 17), all_sprites)
     enemy1 = Enemy((7, 1))
     enemy2 = Enemy((12, 12))
     game = Game(labyrinth, hero, enemy1, enemy2)
 
-    points_food = labyrinth.point() # список с точками
+    points_food = labyrinth.point()
 
     for i in points_food:
         Food(i[0], i[1], all_sprites, food_sprites)
